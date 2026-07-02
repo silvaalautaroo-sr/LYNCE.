@@ -1,0 +1,278 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ---- Lynce dark theme (default) ---- */
+  --bg-primary: #050505;
+  --bg-secondary: #081a2e;
+  --accent-primary: #18c29c;
+  --accent-secondary: #53e4e1;
+
+  --ink: #f4f7f6;
+  --ink-muted: rgba(244, 247, 246, 0.68);
+  --ink-faint: rgba(244, 247, 246, 0.4);
+
+  --border-soft: rgba(244, 247, 246, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-strong: rgba(255, 255, 255, 0.06);
+  --grid-line: rgba(244, 247, 246, 0.05);
+
+  --header-bg: rgba(5, 5, 5, 0.55);
+  --shadow-glow: 0 0 40px rgba(24, 194, 156, 0.18);
+
+  color-scheme: dark;
+}
+
+.light {
+  /* ---- Lynce light theme ---- */
+  --bg-primary: #f6f8f8;
+  --bg-secondary: #e9f2f1;
+  --accent-primary: #0e9d80;
+  --accent-secondary: #1bb9bb;
+
+  --ink: #06141f;
+  --ink-muted: rgba(6, 20, 31, 0.66);
+  --ink-faint: rgba(6, 20, 31, 0.42);
+
+  --border-soft: rgba(6, 20, 31, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --grid-line: rgba(6, 20, 31, 0.06);
+
+  --header-bg: rgba(246, 248, 248, 0.6);
+  --shadow-glow: 0 0 40px rgba(14, 157, 128, 0.14);
+
+  color-scheme: light;
+}
+
+* {
+  border-color: var(--border-soft);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--ink);
+  transition: background-color 0.5s var(--ease-premium, cubic-bezier(0.16, 1, 0.3, 1)),
+    color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--accent-primary);
+  color: #05100d;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------- */
+/* Layout backgrounds                  */
+/* ---------------------------------- */
+
+.bg-grid-static {
+  background-image: var(--grid-image, none);
+}
+
+.bg-app-grid {
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.bg-noise {
+  position: relative;
+}
+
+.bg-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ---------------------------------- */
+/* Glassmorphism                       */
+/* ---------------------------------- */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--border-soft);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--border-soft);
+}
+
+/* Animated traveling-light border, used for header + CTA button.
+   NOTE: this pseudo-element must live on a wrapper that does NOT also
+   carry backdrop-filter directly — combining a masked pseudo-element with
+   backdrop-filter on the same large/wide node fails to composite on some
+   desktop Chromium/Edge builds (works fine on small nodes like buttons,
+   and on mobile where the element is narrow). Keep backdrop-filter on an
+   inner child node instead (see Header.tsx). */
+.animated-border {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  transform: translateZ(0);
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    var(--accent-secondary) 8%,
+    var(--accent-primary) 16%,
+    transparent 28%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: border-rotate 5s linear infinite;
+  pointer-events: none;
+  will-change: transform;
+  z-index: 1;
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Fallback travelling pulse for browsers without @property support is handled
+   by the conic-gradient keyframe above; modern evergreen browsers support it. */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.font-feature-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================================== */
+/* HERO WORD GRADIENT — "inteligentes" special treatment       */
+/* ========================================================== */
+
+.hero-word-gradient {
+  background: linear-gradient(
+    108deg,
+    #18c29c 0%,
+    #2bff9c 20%,
+    #53e4e1 45%,
+    #ffffff 62%,
+    #53e4e1 80%,
+    #18c29c 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hero-gradient-drift 7s ease-in-out infinite alternate;
+}
+
+.light .hero-word-gradient {
+  background: linear-gradient(
+    108deg,
+    #e879f9, #818cf8, #38bdf8, #34d399,
+    #fbbf24, #fb923c, #f87171, #e879f9
+  );
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hero-gradient-rainbow 3.5s linear infinite;
+}
+
+@keyframes hero-gradient-drift {
+  0%   { background-position: 0% 50%;   }
+  100% { background-position: 220% 50%; }
+}
+
+@keyframes hero-gradient-rainbow {
+  0%   { background-position: 0% 50%;   }
+  100% { background-position: 400% 50%; }
+}
+
+/* Light mode hero text colors */
+.light .light-hero-text    { color: #0f172a; }
+.light .light-hero-subtext { color: rgba(15, 23, 42, 0.65); }
+
+/* Light mode — hero fog line color */
+.hero-line-dark  { --tw-gradient-from: rgba(255,255,255,0.3); }
+.light .bg-gradient-to-r.from-hero-line {
+  --tw-gradient-from: rgba(15, 23, 42, 0.2);
+}
+
+/* ========================================================== */
+/* RAINBOW ACCENT — light mode iridescent details              */
+/* ========================================================== */
+
+/* Any element with .rainbow-accent gets iridescent in light mode */
+.light .rainbow-accent {
+  animation: hue-spin 5s linear infinite;
+}
+
+@keyframes hue-spin {
+  from { filter: hue-rotate(0deg) saturate(1.4); }
+  to   { filter: hue-rotate(360deg) saturate(1.4); }
+}
+
+/* SVG lines, node circles, ecosystem graph accents in light mode */
+.light .accent-line,
+.light .accent-dot,
+.light .accent-border {
+  animation: hue-spin 6s linear infinite;
+}
+
+/* ========================================================== */
+/* from-hero-line Tailwind-like helper                         */
+/* ========================================================== */
+.from-hero-line {
+  --tw-gradient-from: rgba(255,255,255,0.25);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255,255,255,0));
+}
+.light .from-hero-line {
+  --tw-gradient-from: rgba(99,102,241,0.4);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(99,102,241,0));
+}

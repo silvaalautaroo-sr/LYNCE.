@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "title": "Lynce — Cosas inteligentes para ciudades inteligentes",
+    "description": "Lynce conecta cada tecnología, cada empresa y cada fuente de datos de la ciudad en un solo ecosistema inteligente."
+  },
+  "nav": {
+    "platform": "Plataforma",
+    "ecosystem": "Ecosistema",
+    "technology": "Tecnología",
+    "vision": "Visión",
+    "about": "Nosotros",
+    "contact": "Contacto",
+    "brand": "Lynce"
+  },
+  "theme": {
+    "toggleToLight": "Cambiar a modo claro",
+    "toggleToDark": "Cambiar a modo oscuro"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "ES",
+    "en": "EN"
+  },
+  "cta": {
+    "talkToUs": "Habla con nosotros"
+  },
+  "hero": {
+    "eyebrow": "Urban Intelligence Layer",
+    "line1": "Cosas",
+    "line2": "inteligentes",
+    "line3": "para ciudades",
+    "line4": "inteligentes.",
+    "ariaLabel": "Cosas inteligentes para ciudades inteligentes"
+  },
+  "section1": {
+    "eyebrow": "El problema",
+    "headlineLine1": "Las ciudades no necesitan más tecnología.",
+    "headlineLine2": "Necesitan tecnologías que trabajen juntas.",
+    "body": "Hoy cientos de empresas construyen tecnología inteligente para las ciudades: tránsito, residuos, iluminación, energía, agua, movilidad, monitoreo ambiental. Cada una resuelve su parte. Pero cada plataforma vive aislada, hablando un idioma distinto, sin ver a las demás. El resultado no es una ciudad inteligente. Es una colección de sistemas inteligentes que no se hablan entre sí."
+  },
+  "ecosystem": {
+    "eyebrow": "Qué hace Lynce",
+    "title": "Todo se conecta a través de Lynce",
+    "subtitle": "Una capa de interoperabilidad donde cada tecnología, cada empresa y cada fuente de datos encuentra su lugar.",
+    "center": "Lynce",
+    "nodes": {
+      "ai": "Inteligencia Artificial",
+      "iot": "IoT",
+      "blockchain": "Blockchain",
+      "satellites": "Satélites",
+      "utilities": "Servicios Públicos",
+      "infrastructure": "Infraestructura",
+      "publicServices": "Servicios al Ciudadano",
+      "industries": "Industrias",
+      "governments": "Gobiernos",
+      "municipalities": "Municipios"
+    }
+  },
+  "platform": {
+    "eyebrow": "Plataforma",
+    "title": "De sistemas aislados a inteligencia unificada",
+    "stepDisconnected": "Tecnologías desconectadas",
+    "stepDisconnectedNote": "Cada proveedor, cada protocolo, cada panel por separado.",
+    "stepLynce": "Lynce",
+    "stepLynceNote": "Una capa común que traduce, sincroniza y conecta.",
+    "stepUnified": "Inteligencia unificada",
+    "stepUnifiedNote": "Una sola vista. Una sola ciudad que piensa como un todo."
+  },
+  "ownSolutions": {
+    "eyebrow": "Soluciones propias",
+    "title": "Lynce también construye",
+    "body": "Mientras conectamos al ecosistema, desarrollamos nuestras propias soluciones de ciudad inteligente: el primer paso para demostrar lo que es posible cuando la tecnología trabaja en conjunto.",
+    "note": "El objetivo final no cambia: ser la capa que conecta a todos los demás."
+  },
+  "technology": {
+    "eyebrow": "Tecnología",
+    "title": "Construido sobre una base abierta",
+    "items": {
+      "ai": {
+        "name": "Inteligencia Artificial",
+        "description": "Modelos que detectan patrones entre sistemas que antes nunca se cruzaban."
+      },
+      "iot": {
+        "name": "IoT",
+        "description": "Miles de sensores, un mismo lenguaje de datos en tiempo real."
+      },
+      "blockchain": {
+        "name": "Blockchain",
+        "description": "Trazabilidad y confianza entre organismos que no se conocen entre sí."
+      },
+      "satellites": {
+        "name": "Satélites",
+        "description": "Visión territorial a gran escala, integrada con lo que ocurre en el terreno."
+      },
+      "cloud": {
+        "name": "Cloud",
+        "description": "Infraestructura elástica que escala con cada nueva ciudad conectada."
+      },
+      "edge": {
+        "name": "Edge Computing",
+        "description": "Decisiones en milisegundos, donde realmente importan: en el borde de la red."
+      }
+    }
+  },
+  "vision": {
+    "eyebrow": "Visión",
+    "statement": "El futuro de las ciudades inteligentes no depende de más tecnología. Depende de que la tecnología deje de competir y empiece a colaborar.",
+    "subtext": "Lynce existe para ser esa colaboración."
+  },
+  "footer": {
+    "tagline": "Cosas inteligentes para ciudades inteligentes.",
+    "navTitle": "Navegación",
+    "contactTitle": "Contacto",
+    "email": "hola@lynce.tech",
+    "rights": "Todos los derechos reservados."
+  }
+}

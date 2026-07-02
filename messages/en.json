@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "title": "Lynce — Smart things for smart cities",
+    "description": "Lynce connects every technology, every company and every data source in the city into one intelligent ecosystem."
+  },
+  "nav": {
+    "platform": "Platform",
+    "ecosystem": "Ecosystem",
+    "technology": "Technology",
+    "vision": "Vision",
+    "about": "About",
+    "contact": "Contact",
+    "brand": "Lynce"
+  },
+  "theme": {
+    "toggleToLight": "Switch to light mode",
+    "toggleToDark": "Switch to dark mode"
+  },
+  "language": {
+    "label": "Language",
+    "es": "ES",
+    "en": "EN"
+  },
+  "cta": {
+    "talkToUs": "Talk to us"
+  },
+  "hero": {
+    "eyebrow": "Urban Intelligence Layer",
+    "line1": "Things",
+    "line2": "Smart",
+    "line3": "Cities",
+    "line4": "Smart.",
+    "ariaLabel": "Smart things, smart cities"
+  },
+  "section1": {
+    "eyebrow": "The problem",
+    "headlineLine1": "Cities don't need more technology.",
+    "headlineLine2": "They need technologies that work together.",
+    "body": "Today hundreds of companies build intelligent technology for cities: traffic, waste, lighting, energy, water, mobility, environmental monitoring. Each one solves its own piece. But every platform lives in isolation, speaking its own language, blind to all the others. The result isn't a smart city. It's a collection of smart systems that never talk to each other."
+  },
+  "ecosystem": {
+    "eyebrow": "What Lynce does",
+    "title": "Everything connects through Lynce",
+    "subtitle": "An interoperability layer where every technology, every company and every data source finds its place.",
+    "center": "Lynce",
+    "nodes": {
+      "ai": "Artificial Intelligence",
+      "iot": "IoT",
+      "blockchain": "Blockchain",
+      "satellites": "Satellites",
+      "utilities": "Utilities",
+      "infrastructure": "Infrastructure",
+      "publicServices": "Public Services",
+      "industries": "Industries",
+      "governments": "Governments",
+      "municipalities": "Municipalities"
+    }
+  },
+  "platform": {
+    "eyebrow": "Platform",
+    "title": "From isolated systems to unified intelligence",
+    "stepDisconnected": "Disconnected technologies",
+    "stepDisconnectedNote": "Every vendor, every protocol, every dashboard apart.",
+    "stepLynce": "Lynce",
+    "stepLynceNote": "A common layer that translates, syncs and connects.",
+    "stepUnified": "Unified intelligence",
+    "stepUnifiedNote": "One single view. One city thinking as a whole."
+  },
+  "ownSolutions": {
+    "eyebrow": "Own solutions",
+    "title": "Lynce also builds",
+    "body": "While we connect the ecosystem, we develop our own Smart City solutions: the first step to prove what's possible when technology works together.",
+    "note": "The end goal stays the same: to be the layer that connects everyone else."
+  },
+  "technology": {
+    "eyebrow": "Technology",
+    "title": "Built on an open foundation",
+    "items": {
+      "ai": {
+        "name": "Artificial Intelligence",
+        "description": "Models that find patterns across systems that never used to intersect."
+      },
+      "iot": {
+        "name": "IoT",
+        "description": "Thousands of sensors, one shared real-time data language."
+      },
+      "blockchain": {
+        "name": "Blockchain",
+        "description": "Traceability and trust between organizations that don't know each other."
+      },
+      "satellites": {
+        "name": "Satellites",
+        "description": "Territory-scale vision, integrated with what's happening on the ground."
+      },
+      "cloud": {
+        "name": "Cloud",
+        "description": "Elastic infrastructure that scales with every new city connected."
+      },
+      "edge": {
+        "name": "Edge Computing",
+        "description": "Millisecond decisions, made where they actually matter: at the edge."
+      }
+    }
+  },
+  "vision": {
+    "eyebrow": "Vision",
+    "statement": "The future of smart cities doesn't depend on more technology. It depends on technology stepping away from competition and into collaboration.",
+    "subtext": "Lynce exists to be that collaboration."
+  },
+  "footer": {
+    "tagline": "Smart things for smart cities.",
+    "navTitle": "Navigation",
+    "contactTitle": "Contact",
+    "email": "hello@lynce.tech",
+    "rights": "All rights reserved."
+  }
+}
