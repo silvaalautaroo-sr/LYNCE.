@@ -16,18 +16,7 @@ const PALETTES = [
   { dl: "#080c18", dr: "#050910", dt: "#0c1222", ll: "#142e52", lr: "#0c1e38", lt: "#1a3a68", ac: [14, 165, 233] as [number,number,number] },
 ] as const;
 
-// Colors reserved for the street vehicles (kept distinct from building
-// palettes so the traffic reads as its own "circulatory system" layer).
-const VEHICLE_COLORS_DARK: [number, number, number][] = [
-  [24, 194, 156],  // brand green
-  [83, 228, 225],  // brand cyan
-  [120, 220, 255], // pale sky
-];
-const VEHICLE_COLORS_LIGHT: [number, number, number][] = [
-  [14, 157, 128],
-  [27, 185, 187],
-  [37, 130, 190],
-];
+type n = number;
 
 function hexToRgb(hex: string): [number, number, number] {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -49,23 +38,10 @@ interface Building {
   winLit: boolean[];
 }
 
-// A small light that circulates along one of the streets running between
-// the buildings (the grid lanes where a building was skipped).
-interface StreetVehicle {
-  fixedIsCol: boolean; // true: moves along a fixed column (varies row); false: fixed row (varies col)
-  fixed: number;        // the fixed col/row index
-  t: number;            // continuous position along the moving axis
-  dir: 1 | -1;
-  colorIdx: number;
-  speedIdle: number;
-  speedBoost: number;
-}
-
 export function HeroCity() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const bRef = useRef<Building[]>([]);
-  const vRef = useRef<StreetVehicle[]>([]);
   const rafRef = useRef(0);
   const { resolvedTheme } = useTheme();
   const themeRef = useRef(resolvedTheme);
@@ -92,8 +68,6 @@ export function HeroCity() {
 
     // Generate city grid
     const buildings: Building[] = [];
-    const streetCols: number[] = [];
-    const streetRows: number[] = [];
     for (let col = 0; col < GRID; col++) {
       for (let row = 0; row < GRID; row++) {
         if (col % 5 === 2 || row % 5 === 2) continue; // streets
@@ -108,63 +82,25 @@ export function HeroCity() {
         });
       }
     }
-    for (let i = 0; i < GRID; i++) {
-      if (i % 5 === 2) { streetCols.push(i); streetRows.push(i); }
-    }
     buildings.sort((a, b) => (a.col + a.row) - (b.col + b.row));
     bRef.current = buildings;
 
-    // Populate street vehicles: a few per lane, opposite directions,
-    // gently idling until the cursor passes nearby.
-    const vehicles: StreetVehicle[] = [];
-    streetCols.forEach((c, i) => {
-      for (let k = 0; k < 3; k++) {
-        vehicles.push({
-          fixedIsCol: true,
-          fixed: c,
-          t: (k / 3) * GRID + Math.random() * 1.5,
-          dir: k % 2 === 0 ? 1 : -1,
-          colorIdx: (i + k) % VEHICLE_COLORS_DARK.length,
-          speedIdle: 0.12 + Math.random() * 0.08,
-          speedBoost: 1.1 + Math.random() * 0.5,
-        });
-      }
-    });
-    streetRows.forEach((r, i) => {
-      for (let k = 0; k < 3; k++) {
-        vehicles.push({
-          fixedIsCol: false,
-          fixed: r,
-          t: (k / 3) * GRID + Math.random() * 1.5,
-          dir: k % 2 === 0 ? 1 : -1,
-          colorIdx: (i + k + 1) % VEHICLE_COLORS_DARK.length,
-          speedIdle: 0.12 + Math.random() * 0.08,
-          speedBoost: 1.1 + Math.random() * 0.5,
-        });
-      }
-    });
-    vRef.current = vehicles;
-
     let startTime = 0;
-    let lastTs = 0;
 
     const animate = (ts: number) => {
       if (!startTime) startTime = ts;
       const time = (ts - startTime) / 1000;
-      const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0;
-      lastTs = ts;
 
       const W = canvas.offsetWidth;
       const H = canvas.offsetHeight;
       const isDark = themeRef.current !== "light";
 
-      // City tile size + origin — enlarged so the skyline occupies more
-      // of the frame than before.
-      const TW = Math.max(52, Math.min(100, W / 10));
+      const TW = Math.max(46, Math.min(86, W / 12));
       const TH = TW * 0.5;
-      const OX = W * 0.62;
-      const OY = H * 0.57;
-      const MR = Math.min(W, H) * 0.28;
+      // City sits in the right-center area of the viewport
+      const OX = W * 0.65;
+      const OY = H * 0.56;
+      const MR = Math.min(W, H) * 0.26;
 
       ctx.clearRect(0, 0, W, H);
 
@@ -361,49 +297,6 @@ export function HeroCity() {
         }
       });
 
-      // ── Street vehicles: small lights circulating the lanes between
-      //    buildings. They idle quietly and speed up / glow brighter when
-      //    the cursor passes near them. ──────────────────────────────────
-      const vehicleColors = isDark ? VEHICLE_COLORS_DARK : VEHICLE_COLORS_LIGHT;
-      vRef.current.forEach(v => {
-        const col = v.fixedIsCol ? v.fixed : v.t;
-        const row = v.fixedIsCol ? v.t : v.fixed;
-        const vx = OX + (col - row) * TW / 2;
-        const vy = OY + (col + row) * TH / 2;
-
-        const dx = mx - vx, dy = my - vy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const vInfluence = Math.max(0, 1 - dist / (TW * 2.6));
-
-        // Advance position — idles gently, accelerates near the cursor.
-        const speed = v.speedIdle + vInfluence * v.speedBoost;
-        if (dt > 0) {
-          v.t += speed * dt * v.dir;
-          if (v.t > GRID) v.t -= GRID;
-          if (v.t < 0) v.t += GRID;
-        }
-
-        const [cr, cg, cb] = vehicleColors[v.colorIdx];
-        const baseOpacity = isDark ? 0.35 : 0.45;
-        const opacity = baseOpacity + vInfluence * 0.5;
-        const radius = 1.6 + vInfluence * 2.2;
-
-        // Soft trailing glow
-        const gr = ctx.createRadialGradient(vx, vy, 0, vx, vy, radius * (3 + vInfluence * 3));
-        gr.addColorStop(0, `rgba(${cr},${cg},${cb},${opacity * 0.5})`);
-        gr.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-        ctx.fillStyle = gr;
-        ctx.beginPath();
-        ctx.arc(vx, vy, radius * (3 + vInfluence * 3), 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(vx, vy, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${opacity})`;
-        ctx.fill();
-      });
-
       // ── Floating micro-particles ─────────────────────────────────────────────
       for (let i = 0; i < 22; i++) {
         const px = W * 0.1 + (Math.sin(time * 0.16 + i * 2.3) * 0.5 + 0.5) * W * 0.82;
@@ -425,11 +318,11 @@ export function HeroCity() {
       ctx.fillRect(0, H * 0.68, W, H * 0.32);
 
       // Left fade (text area stays clean)
-      const lfg = ctx.createLinearGradient(0, 0, W * 0.35, 0);
+      const lfg = ctx.createLinearGradient(0, 0, W * 0.38, 0);
       lfg.addColorStop(0, isDark ? "rgba(3,8,20,0.85)" : "rgba(234,241,251,0.88)");
       lfg.addColorStop(1, isDark ? "rgba(3,8,20,0)" : "rgba(234,241,251,0)");
       ctx.fillStyle = lfg;
-      ctx.fillRect(0, 0, W * 0.35, H);
+      ctx.fillRect(0, 0, W * 0.38, H);
 
       rafRef.current = requestAnimationFrame(animate);
     };
@@ -446,19 +339,20 @@ export function HeroCity() {
       mouseRef.current = { x: t.clientX - rect.left, y: t.clientY - rect.top };
     };
     const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
-    const onResize = () => { resize(); };
 
     canvas.addEventListener("mousemove", onMove);
     canvas.addEventListener("mouseleave", onLeave);
     canvas.addEventListener("touchmove", onTouch, { passive: true });
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", () => {
+      resize();
+      // rebuild buildings on resize
+    });
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       canvas.removeEventListener("mousemove", onMove);
       canvas.removeEventListener("mouseleave", onLeave);
       canvas.removeEventListener("touchmove", onTouch);
-      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -467,19 +361,25 @@ export function HeroCity() {
       {/* Canvas background */}
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Text overlay — left 60%.
-          pointer-events-none lets mouse/touch reach the canvas underneath,
-          including the area to the right where the city sits. */}
-      <div className="pointer-events-none absolute inset-0 flex items-center">
+      {/* Text overlay — left 60% */}
+      <div className="absolute inset-0 flex items-center">
         <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
           <div className="w-full md:w-[60%]">
 
-            {/* Main headline — Inter, bold. Only the word "Smart" (both
-                instances) gets the animated gradient treatment; the rest
-                stays a plain solid color. */}
+            {/* Eyebrow */}
+            <motion.p
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="mb-7 text-[0.7rem] font-medium uppercase tracking-[0.32em] text-white/40 dark:text-white/38 light:text-slate-400"
+            >
+              Urban Intelligence Layer
+            </motion.p>
+
+            {/* Main headline */}
             <h1
-              aria-label="Smart Sight for Smart Cities"
-              className="font-hero font-bold leading-[1.05] tracking-tight select-none"
+              aria-label="Cosas inteligentes para ciudades inteligentes"
+              className="font-semibold leading-[1.0] tracking-tight select-none"
               style={{ fontSize: "clamp(2.4rem, 7vw, 5.8rem)" }}
             >
               <motion.span
@@ -488,16 +388,36 @@ export function HeroCity() {
                 transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 className="block text-white dark:text-white light-hero-text"
               >
-                <span className="hero-word-gradient">Smart</span> Sight
+                Cosas
               </motion.span>
 
               <motion.span
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-                className="block text-white/85 dark:text-white/85 light-hero-text"
+                transition={{ duration: 1, delay: 0.78, ease: [0.16, 1, 0.3, 1] }}
+                className="block hero-word-gradient"
               >
-                for <span className="hero-word-gradient">Smart</span> Cities
+                inteligentes
+              </motion.span>
+
+              <motion.span
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.91, ease: [0.16, 1, 0.3, 1] }}
+                className="block text-white/75 dark:text-white/72 light-hero-subtext"
+                style={{ fontSize: "0.78em" }}
+              >
+                para ciudades
+              </motion.span>
+
+              <motion.span
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1.04, ease: [0.16, 1, 0.3, 1] }}
+                className="block hero-word-gradient"
+                style={{ fontSize: "0.78em" }}
+              >
+                inteligentes.
               </motion.span>
             </h1>
 
