@@ -1,68 +1,85 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useTheme } from "next-themes";
 
 export function Logo() {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme !== "light";
-  const iconSrc = isDark ? "/logo/lynx-icon-light.png" : "/logo/lynx-icon-dark.png";
-
+  const [mounted, setMounted]   = useState(false);
+  const [heroH,   setHeroH]     = useState(800);
   const { scrollY } = useScroll();
-  const [heroHeight, setHeroHeight] = useState(0);
 
   useEffect(() => {
-    const measure = () => {
-      const hero = document.getElementById("hero");
-      setHeroHeight(hero ? hero.offsetHeight : window.innerHeight);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    setMounted(true);
+    const update = () => setHeroH(window.innerHeight);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  // The morph is driven purely by scroll position, not a discrete
-  // on/off flag: it starts once the hero has begun leaving the
-  // viewport (~35% of its height scrolled) and completes shortly
-  // after (~75%), so the icon-only state stays intact while the
-  // hero is still the focal point of the screen.
-  const morphStart = heroHeight > 0 ? heroHeight * 0.35 : 200;
-  const morphEnd = heroHeight > 0 ? heroHeight * 0.75 : 420;
+  const isDark = !mounted || resolvedTheme !== "light";
+  const isLight = mounted && resolvedTheme === "light";
 
-  // Icon shrinks + slides slightly left as it morphs (transform, not opacity).
-  const iconWidth = useTransform(scrollY, [morphStart, morphEnd], [36, 26]);
-  const iconHeight = useTransform(scrollY, [morphStart, morphEnd], [52, 38]);
-  const iconX = useTransform(scrollY, [morphStart, morphEnd], [0, -2]);
+  // ── Animation range ─────────────────────────────────────────────────────
+  // Starts fading the wordmark at 35% of hero height, fully hidden at 75%
+  const s = heroH * 0.35;
+  const e = heroH * 0.75;
 
-  // Wordmark reveals via a clipping width transform (a wipe), never opacity.
-  const textWidth = useTransform(scrollY, [morphStart, morphEnd], [0, 104]);
+  // Icon: starts at 40×60, stays at 40×60 while hero is visible,
+  // then grows ever so slightly (44×66) once text is gone — subtle weight shift
+  const iconW = useTransform(scrollY, [s, e], [40, 44]);
+  const iconH = useTransform(scrollY, [s, e], [60, 66]);
+
+  // Wordmark: visible in hero, hides on scroll
+  // Uses opacity + x shift + blur filter — NOT a simple fade
+  const textOpacity = useTransform(scrollY, [s, e * 0.7], [1, 0]);
+  const textX       = useTransform(scrollY, [s, e],       [0, -8]);
+  const textScale   = useTransform(scrollY, [s, e * 0.8], [1, 0.88]);
+  const textBlur    = useTransform(scrollY, [s, e * 0.75], [0, 6]);
+  // letter-spacing opens slightly as it dissolves (premium feel)
+  const textLS      = useTransform(scrollY, [s, e], ["0.18em", "0.36em"]);
+
+  const iconSrc = isDark
+    ? "/logo/lynx-icon-light.png"
+    : "/logo/lynx-icon-dark.png";
 
   return (
-    <div className="flex items-center gap-2 select-none">
-      {/* Lynx icon */}
+    <div className="flex items-center gap-2.5 select-none overflow-hidden">
+      {/* Lynx icon — always visible, size driven by scroll */}
       <motion.div
-        style={{ width: iconWidth, height: iconHeight, x: iconX }}
-        className="relative flex-shrink-0 overflow-hidden"
+        className="relative flex-shrink-0"
+        style={{ width: iconW, height: iconH }}
       >
-        <Image
-          src={iconSrc}
-          alt="Lynce lynx icon"
-          fill
-          sizes="52px"
-          className="object-contain object-center"
-          priority
-        />
+        {mounted && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={iconSrc}
+            alt="Lynce"
+            className="h-full w-full object-contain"
+          />
+        )}
       </motion.div>
 
-      {/* LYNCE wordmark — clipped by an animated width, revealed by a
-          transform wipe rather than a fade */}
-      <motion.div style={{ width: textWidth }} className="overflow-hidden">
-        <span className="inline-block whitespace-nowrap text-[1.25rem] font-semibold tracking-[0.16em] text-ink">
-          LYNCE
-        </span>
-      </motion.div>
+      {/* LYNCE wordmark — visible by default, dissolves into icon on scroll */}
+      <motion.span
+        style={{
+          opacity:       textOpacity,
+          x:             textX,
+          scale:         textScale,
+          letterSpacing: textLS,
+          filter:        useTransform(textBlur, (v) => `blur(${v}px)`),
+        }}
+        className={[
+          "text-[1.18rem] font-semibold whitespace-nowrap",
+          // Light mode: rainbow gradient on the wordmark
+          isLight
+            ? "navbar-wordmark-rainbow"
+            : "text-ink",
+        ].join(" ")}
+      >
+        LYNCE
+      </motion.span>
     </div>
   );
 }
