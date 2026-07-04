@@ -129,18 +129,10 @@ body {
   border: 1px solid var(--border-soft);
 }
 
-/* Animated traveling-light border, used for header + CTA button.
-   NOTE: this pseudo-element must live on a wrapper that does NOT also
-   carry backdrop-filter directly — combining a masked pseudo-element with
-   backdrop-filter on the same large/wide node fails to composite on some
-   desktop Chromium/Edge builds (works fine on small nodes like buttons,
-   and on mobile where the element is narrow). Keep backdrop-filter on an
-   inner child node instead (see Header.tsx). */
+/* Animated traveling-light border, used for header + CTA button */
 .animated-border {
   position: relative;
   isolation: isolate;
-  z-index: 0;
-  transform: translateZ(0);
 }
 
 .animated-border::before {
@@ -159,11 +151,9 @@ body {
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
   animation: border-rotate 5s linear infinite;
   pointer-events: none;
-  will-change: transform;
   z-index: 1;
 }
 
@@ -197,18 +187,17 @@ body {
 .hero-word-gradient {
   background: linear-gradient(
     108deg,
-    #18c29c 0%,
-    #2bff9c 20%,
-    #53e4e1 45%,
-    #ffffff 62%,
-    #53e4e1 80%,
-    #18c29c 100%
+    #6366f1 0%,
+    #818cf8 22%,
+    #06b6d4 55%,
+    #3b82f6 80%,
+    #8b5cf6 100%
   );
-  background-size: 260% 100%;
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: hero-gradient-drift 7s ease-in-out infinite alternate;
+  animation: hero-gradient-drift 6s ease-in-out infinite alternate;
 }
 
 .light .hero-word-gradient {
@@ -275,4 +264,35 @@ body {
 .light .from-hero-line {
   --tw-gradient-from: rgba(99,102,241,0.4);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(99,102,241,0));
+}
+
+/* ========================================================== */
+/* NAVBAR WORDMARK — rainbow in light mode                     */
+/* ========================================================== */
+
+.navbar-wordmark-rainbow {
+  /* Dark mode: plain ink color (handled by text-ink class) */
+  color: var(--ink);
+}
+
+.light .navbar-wordmark-rainbow {
+  background: linear-gradient(
+    108deg,
+    #e879f9 0%,
+    #818cf8 22%,
+    #38bdf8 45%,
+    #34d399 65%,
+    #fbbf24 82%,
+    #f87171 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: navbar-rainbow-sweep 4s linear infinite;
+}
+
+@keyframes navbar-rainbow-sweep {
+  0%   { background-position: 0%   50%; }
+  100% { background-position: 300% 50%; }
 }
