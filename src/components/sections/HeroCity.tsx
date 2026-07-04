@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 // ---------------------------------------------------------------------------
 // Building palettes — dark at rest, illuminated only by mouse proximity
@@ -39,6 +40,7 @@ interface Building {
 }
 
 export function HeroCity() {
+  const t = useTranslations("hero");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const bRef = useRef<Building[]>([]);
@@ -152,11 +154,10 @@ export function HeroCity() {
       // ── Buildings ────────────────────────────────────────────────────────────
       bRef.current.forEach(b => {
         const cx = OX + (b.col - b.row) * TW / 2;
-        const cy = OY + (b.col + b.row) * TH / 2;
-        const hw = TW / 2, hh = TH / 2;
+        const cyBase = OY + (b.col + b.row) * TH / 2;
 
         // Mouse influence (0 → 1)
-        const dx = mx - cx, dy = my - cy;
+        const dx = mx - cx, dy = my - cyBase;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const influence = Math.max(0, 1 - dist / MR);
         b.targetH = b.baseH + influence * 160;
@@ -167,6 +168,14 @@ export function HeroCity() {
         b.currentH += (b.targetH * introEased - b.currentH) * 0.1;
         const h = b.currentH;
         if (h < 1) return;
+
+        // Micro-interaction (300–500ms feel via the 0.1 smoothing above):
+        // buildings near the cursor lift slightly on Y and scale up, on
+        // top of growing taller, so the reaction reads as "elevate" not
+        // just "grow".
+        const scale = 1 + influence * 0.06;
+        const hw = (TW / 2) * scale, hh = (TH / 2) * scale;
+        const cy = cyBase - influence * 5;
 
         const pal = PALETTES[b.pi];
         const ac = isDark ? pal.ac : getRainbowRgb(b.pi, time);
@@ -361,8 +370,13 @@ export function HeroCity() {
       {/* Canvas background */}
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Text overlay — left 60% */}
-      <div className="absolute inset-0 flex items-center">
+      {/* Text overlay — left 60%.
+          pointer-events-none is critical here: this wrapper spans the
+          FULL hero (inset-0), including the right-hand area where the
+          isometric city sits. Without it, this transparent layer sat on
+          top of the canvas and silently absorbed every mousemove event,
+          which is why the buildings never reacted to the cursor. */}
+      <div className="pointer-events-none absolute inset-0 flex items-center">
         <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
           <div className="w-full md:w-[60%]">
 
@@ -373,13 +387,13 @@ export function HeroCity() {
               transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="mb-7 text-[0.7rem] font-medium uppercase tracking-[0.32em] text-white/40 dark:text-white/38 light:text-slate-400"
             >
-              Urban Intelligence Layer
+              {t("eyebrow")}
             </motion.p>
 
             {/* Main headline */}
             <h1
-              aria-label="Cosas inteligentes para ciudades inteligentes"
-              className="font-semibold leading-[1.0] tracking-tight select-none"
+              aria-label={t("ariaLabel")}
+              className="font-hero font-semibold leading-[1.08] tracking-tight select-none"
               style={{ fontSize: "clamp(2.4rem, 7vw, 5.8rem)" }}
             >
               <motion.span
@@ -388,16 +402,16 @@ export function HeroCity() {
                 transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 className="block text-white dark:text-white light-hero-text"
               >
-                Cosas
+                {t("line1")}
               </motion.span>
 
               <motion.span
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.78, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
+                className="block hero-word-gradient font-bold"
               >
-                inteligentes
+                {t("line2")}
               </motion.span>
 
               <motion.span
@@ -405,19 +419,17 @@ export function HeroCity() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.91, ease: [0.16, 1, 0.3, 1] }}
                 className="block text-white/75 dark:text-white/72 light-hero-subtext"
-                style={{ fontSize: "0.78em" }}
               >
-                para ciudades
+                {t("line3")}
               </motion.span>
 
               <motion.span
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 1.04, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
-                style={{ fontSize: "0.78em" }}
+                className="block hero-word-gradient font-bold"
               >
-                inteligentes.
+                {t("line4")}
               </motion.span>
             </h1>
 
