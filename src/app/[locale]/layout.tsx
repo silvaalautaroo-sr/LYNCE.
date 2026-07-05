@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -10,18 +10,11 @@ import { Footer } from "@/components/layout/Footer";
 import { BackgroundFX } from "@/components/ui/BackgroundFX";
 import "@/app/globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-space-grotesk",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export async function generateStaticParams() {
@@ -85,9 +78,9 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${inter.variable}`}
+      className={inter.variable}
     >
-      <body className="min-h-screen antialiased">
+      <body className="min-h-screen font-light antialiased">
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             <BackgroundFX />
