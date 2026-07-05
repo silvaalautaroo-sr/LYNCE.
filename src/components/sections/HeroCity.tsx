@@ -17,7 +17,21 @@ const PALETTES = [
   { dl: "#080c18", dr: "#050910", dt: "#0c1222", ll: "#142e52", lr: "#0c1e38", lt: "#1a3a68", ac: [14, 165, 233] as [number,number,number] },
 ] as const;
 
-type n = number;
+// Street "vehicles" — small glowing spheres that circulate the lanes
+// between buildings (they never leave those lanes, so collisions with
+// buildings are structurally impossible).
+const VEHICLE_COLORS_DARK: [number, number, number][] = [
+  [24, 194, 156],  // neon green
+  [83, 228, 225],  // cyan
+  [120, 170, 255], // blue
+  [180, 130, 255], // purple
+];
+const VEHICLE_COLORS_LIGHT: [number, number, number][] = [
+  [14, 157, 128],
+  [27, 185, 187],
+  [60, 130, 220],
+  [150, 110, 210],
+];
 
 function hexToRgb(hex: string): [number, number, number] {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -32,6 +46,19 @@ function blendHex(a: string, b: string, t: number): string {
   return `rgb(${Math.round(ar + (br - ar) * t)},${Math.round(ag + (bg - ag) * t)},${Math.round(ab + (bb - ab) * t)})`;
 }
 
+// Parses "rgb(r,g,b)" / "rgba(r,g,b,a)" and nudges brightness by `amt`
+// (-255..255), used to fake a soft top-lit / bottom-shaded gradient on
+// each building face instead of a flat fill.
+function shade(color: string, amt: number): string {
+  const m = color.match(/rgba?\(([^)]+)\)/);
+  if (!m) return color;
+  const parts = m[1].split(",").map(s => parseFloat(s.trim()));
+  const [r, g, b, a] = parts;
+  const clamp = (v: number) => Math.max(0, Math.min(255, v));
+  const nr = clamp(r + amt), ng = clamp(g + amt), nb = clamp(b + amt);
+  return a === undefined ? `rgb(${nr},${ng},${nb})` : `rgba(${nr},${ng},${nb},${a})`;
+}
+
 interface Building {
   col: number; row: number;
   baseH: number; currentH: number; targetH: number;
@@ -39,11 +66,24 @@ interface Building {
   winLit: boolean[];
 }
 
+interface StreetVehicle {
+  fixedIsCol: boolean; // true: fixed column, moves along row / false: fixed row, moves along col
+  fixed: number;
+  t: number;
+  dir: 1 | -1;
+  colorIdx: number;
+  speedIdle: number;
+  speedBoost: number;
+  wobblePhase: number;
+  trail: { x: number; y: number }[];
+}
+
 export function HeroCity() {
   const t = useTranslations("hero");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const bRef = useRef<Building[]>([]);
+  const vRef = useRef<StreetVehicle[]>([]);
   const rafRef = useRef(0);
   const { resolvedTheme } = useTheme();
   const themeRef = useRef(resolvedTheme);
@@ -64,15 +104,18 @@ export function HeroCity() {
       const h = canvas.offsetHeight;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
     };
     resize();
 
     // Generate city grid
     const buildings: Building[] = [];
+    const streetCols: number[] = [];
+    const streetRows: number[] = [];
     for (let col = 0; col < GRID; col++) {
       for (let row = 0; row < GRID; row++) {
-        if (col % 5 === 2 || row % 5 === 2) continue; // streets
+        if (col % 5 === 2 || row % 5 === 2) continue; // streets — kept empty
         const baseH = 8 + Math.random() * 60;
         buildings.push({
           col, row, baseH,
@@ -84,44 +127,81 @@ export function HeroCity() {
         });
       }
     }
+    for (let i = 0; i < GRID; i++) {
+      if (i % 5 === 2) { streetCols.push(i); streetRows.push(i); }
+    }
     buildings.sort((a, b) => (a.col + a.row) - (b.col + b.row));
     bRef.current = buildings;
 
+    // Populate street vehicles — a few per lane, opposite directions,
+    // idling gently until the cursor passes nearby.
+    const vehicles: StreetVehicle[] = [];
+    streetCols.forEach((c, i) => {
+      for (let k = 0; k < 3; k++) {
+        vehicles.push({
+          fixedIsCol: true, fixed: c,
+          t: (k / 3) * GRID + Math.random() * 1.5,
+          dir: k % 2 === 0 ? 1 : -1,
+          colorIdx: (i + k) % VEHICLE_COLORS_DARK.length,
+          speedIdle: 0.12 + Math.random() * 0.08,
+          speedBoost: 1.2 + Math.random() * 0.6,
+          wobblePhase: Math.random() * Math.PI * 2,
+          trail: [],
+        });
+      }
+    });
+    streetRows.forEach((r, i) => {
+      for (let k = 0; k < 3; k++) {
+        vehicles.push({
+          fixedIsCol: false, fixed: r,
+          t: (k / 3) * GRID + Math.random() * 1.5,
+          dir: k % 2 === 0 ? 1 : -1,
+          colorIdx: (i + k + 1) % VEHICLE_COLORS_DARK.length,
+          speedIdle: 0.12 + Math.random() * 0.08,
+          speedBoost: 1.2 + Math.random() * 0.6,
+          wobblePhase: Math.random() * Math.PI * 2,
+          trail: [],
+        });
+      }
+    });
+    vRef.current = vehicles;
+
     let startTime = 0;
+    let lastTs = 0;
 
     const animate = (ts: number) => {
       if (!startTime) startTime = ts;
       const time = (ts - startTime) / 1000;
+      const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0;
+      lastTs = ts;
 
       const W = canvas.offsetWidth;
       const H = canvas.offsetHeight;
       const isDark = themeRef.current !== "light";
 
-      const TW = Math.max(46, Math.min(86, W / 12));
+      const TW = Math.max(52, Math.min(100, W / 10));
       const TH = TW * 0.5;
-      // City sits in the right-center area of the viewport
-      const OX = W * 0.65;
-      const OY = H * 0.56;
-      const MR = Math.min(W, H) * 0.26;
+      const OX = W * 0.62;
+      const OY = H * 0.57;
+      const MR = Math.min(W, H) * 0.28;
 
       ctx.clearRect(0, 0, W, H);
 
-      // ── Background ──────────────────────────────────────────────────────────
+      // ── Background ────────────────────────────────────────────────────
       if (isDark) {
         const bg = ctx.createLinearGradient(0, 0, W, H);
-        bg.addColorStop(0, "#030814");
-        bg.addColorStop(0.5, "#02060f");
-        bg.addColorStop(1, "#010408");
+        bg.addColorStop(0, "#050505");
+        bg.addColorStop(0.5, "#030307");
+        bg.addColorStop(1, "#090909");
         ctx.fillStyle = bg;
       } else {
         const bg = ctx.createLinearGradient(0, 0, W, H);
-        bg.addColorStop(0, "#eaf1fb");
-        bg.addColorStop(1, "#dce8f8");
+        bg.addColorStop(0, "#faf8f4");
+        bg.addColorStop(1, "#f2ede5");
         ctx.fillStyle = bg;
       }
       ctx.fillRect(0, 0, W, H);
 
-      // Atmospheric glow behind text (left side)
       if (isDark) {
         const atmG = ctx.createRadialGradient(W * 0.25, H * 0.5, 0, W * 0.25, H * 0.5, W * 0.45);
         atmG.addColorStop(0, "rgba(99,102,241,0.055)");
@@ -131,8 +211,8 @@ export function HeroCity() {
         ctx.fillRect(0, 0, W, H);
       }
 
-      // ── Ground grid lines ───────────────────────────────────────────────────
-      ctx.strokeStyle = isDark ? "rgba(30,60,120,0.09)" : "rgba(100,150,220,0.12)";
+      // ── Ground grid lines ───────────────────────────────────────────────
+      ctx.strokeStyle = isDark ? "rgba(30,60,120,0.09)" : "rgba(100,150,220,0.14)";
       ctx.lineWidth = 0.5;
       for (let c = 0; c < GRID; c++) {
         for (let r = 0; r < GRID; r++) {
@@ -151,28 +231,23 @@ export function HeroCity() {
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
 
-      // ── Buildings ────────────────────────────────────────────────────────────
+      // ── Buildings ─────────────────────────────────────────────────────
       bRef.current.forEach(b => {
         const cx = OX + (b.col - b.row) * TW / 2;
         const cyBase = OY + (b.col + b.row) * TH / 2;
 
-        // Mouse influence (0 → 1)
         const dx = mx - cx, dy = my - cyBase;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const influence = Math.max(0, 1 - dist / MR);
         b.targetH = b.baseH + influence * 160;
 
-        // Intro animation (buildings rise from ground on page load)
         const introFactor = Math.min(1, Math.max(0, (time - (b.col + b.row) * 0.04) * 1.4));
         const introEased = 1 - (1 - introFactor) ** 2.8;
+        // 300–500ms smoothing for the rise/scale/glow micro-interaction
         b.currentH += (b.targetH * introEased - b.currentH) * 0.1;
         const h = b.currentH;
         if (h < 1) return;
 
-        // Micro-interaction (300–500ms feel via the 0.1 smoothing above):
-        // buildings near the cursor lift slightly on Y and scale up, on
-        // top of growing taller, so the reaction reads as "elevate" not
-        // just "grow".
         const scale = 1 + influence * 0.06;
         const hw = (TW / 2) * scale, hh = (TH / 2) * scale;
         const cy = cyBase - influence * 5;
@@ -180,44 +255,57 @@ export function HeroCity() {
         const pal = PALETTES[b.pi];
         const ac = isDark ? pal.ac : getRainbowRgb(b.pi, time);
 
-        // ── Faces: blend between dark base and lit version based on influence ──
-        // LEFT FACE
+        // ── Faces: gradient fill (depth) instead of flat color ───────────
+        const leftBase = isDark
+          ? blendHex(pal.dl, pal.ll, influence * influence)
+          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.08 + influence * 0.35})`;
+        const leftGrad = ctx.createLinearGradient(cx - hw, cy - h, cx, cy + hh - h);
+        leftGrad.addColorStop(0, shade(leftBase, isDark ? 14 : 10));
+        leftGrad.addColorStop(1, shade(leftBase, isDark ? -16 : -6));
+
         ctx.beginPath();
         ctx.moveTo(cx - hw, cy);
         ctx.lineTo(cx, cy + hh);
         ctx.lineTo(cx, cy + hh - h);
         ctx.lineTo(cx - hw, cy - h);
         ctx.closePath();
-        ctx.fillStyle = isDark
-          ? blendHex(pal.dl, pal.ll, influence * influence)
-          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.08 + influence * 0.35})`;
+        ctx.fillStyle = leftGrad;
         ctx.fill();
 
-        // RIGHT FACE
+        const rightBase = isDark
+          ? blendHex(pal.dr, pal.lr, influence * influence)
+          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.05 + influence * 0.22})`;
+        const rightGrad = ctx.createLinearGradient(cx, cy - h, cx + hw, cy);
+        rightGrad.addColorStop(0, shade(rightBase, isDark ? 6 : 6));
+        rightGrad.addColorStop(1, shade(rightBase, isDark ? -20 : -10));
+
         ctx.beginPath();
         ctx.moveTo(cx, cy + hh);
         ctx.lineTo(cx + hw, cy);
         ctx.lineTo(cx + hw, cy - h);
         ctx.lineTo(cx, cy + hh - h);
         ctx.closePath();
-        ctx.fillStyle = isDark
-          ? blendHex(pal.dr, pal.lr, influence * influence)
-          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.05 + influence * 0.22})`;
+        ctx.fillStyle = rightGrad;
         ctx.fill();
 
-        // TOP FACE
+        const topBase = isDark
+          ? blendHex(pal.dt, pal.lt, influence * influence)
+          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.12 + influence * 0.5})`;
+        const topGrad = ctx.createLinearGradient(cx - hw, cy - h, cx + hw, cy - h - hh);
+        topGrad.addColorStop(0, shade(topBase, isDark ? -6 : -4));
+        topGrad.addColorStop(0.5, shade(topBase, isDark ? 26 : 16));
+        topGrad.addColorStop(1, shade(topBase, isDark ? -6 : -4));
+
         ctx.beginPath();
         ctx.moveTo(cx - hw, cy - h);
         ctx.lineTo(cx, cy - hh - h);
         ctx.lineTo(cx + hw, cy - h);
         ctx.lineTo(cx, cy + hh - h);
         ctx.closePath();
-        ctx.fillStyle = isDark
-          ? blendHex(pal.dt, pal.lt, influence * influence)
-          : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.12 + influence * 0.5})`;
+        ctx.fillStyle = topGrad;
         ctx.fill();
 
-        // Outline edges (always visible but subtle)
+        // Outline edges
         ctx.strokeStyle = isDark
           ? `rgba(${ac[0]},${ac[1]},${ac[2]},${0.06 + influence * 0.25})`
           : `rgba(${ac[0]},${ac[1]},${ac[2]},${0.2 + influence * 0.6})`;
@@ -234,15 +322,14 @@ export function HeroCity() {
         ctx.lineTo(cx + hw, cy - h);
         ctx.stroke();
 
-        // ── Windows: only visible with mouse proximity ──────────────────────
+        // ── Windows: only visible with mouse proximity ──────────────────
         if (influence > 0.18 && h > 20) {
           const winCount = Math.min(4, Math.floor(h / 17));
           for (let wi = 0; wi < winCount; wi++) {
             for (let wj = 0; wj < 2; wj++) {
               const idx = wi * 2 + wj;
               if (idx >= b.winLit.length || !b.winLit[idx]) continue;
-              const wpulse = (Math.sin(time * 1.6 + b.pOff + wi * 0.9 + wj * 1.2) * 0.45 + 0.55)
-                * influence;
+              const wpulse = (Math.sin(time * 1.6 + b.pOff + wi * 0.9 + wj * 1.2) * 0.45 + 0.55) * influence;
               const wFrac = (wi + 1) / (winCount + 1);
               const wjFrac = (wj + 0.5) / 2;
               const wx = cx - hw * (1 - wjFrac * 0.42) + wjFrac * hw * 0.1;
@@ -267,7 +354,7 @@ export function HeroCity() {
           }
         }
 
-        // ── Vertical energy pulse: only when mouse is close ─────────────────
+        // ── Vertical energy pulse: only when mouse is close ──────────────
         if (influence > 0.35 && h > 30) {
           const pFrac = ((time * 0.55 + b.pOff / (Math.PI * 2)) % 1.0);
           const pOpacity = Math.sin(pFrac * Math.PI) * influence * 0.85;
@@ -292,7 +379,7 @@ export function HeroCity() {
           }
         }
 
-        // ── Rooftop beacon: only when strongly illuminated ───────────────────
+        // ── Rooftop beacon: only when strongly illuminated ───────────────
         if (influence > 0.6 && h > 45) {
           const rg = (0.6 + Math.sin(time * 1.5 + b.pOff) * 0.4) * influence;
           const rpX = cx, rpY = cy - hh - h;
@@ -306,7 +393,67 @@ export function HeroCity() {
         }
       });
 
-      // ── Floating micro-particles ─────────────────────────────────────────────
+      // ── Street vehicles: glowing spheres circulating the lanes ─────────
+      // They're mathematically confined to the empty street lanes, so
+      // they never overlap a building. A small sine "wobble" perpendicular
+      // to the lane gives them a soft curved, believable path instead of
+      // a rigid straight line.
+      const vehicleColors = isDark ? VEHICLE_COLORS_DARK : VEHICLE_COLORS_LIGHT;
+      vRef.current.forEach(v => {
+        const wobble = Math.sin(time * 0.9 + v.wobblePhase) * 0.16;
+        const col = v.fixedIsCol ? v.fixed + wobble : v.t;
+        const row = v.fixedIsCol ? v.t : v.fixed + wobble;
+        const vx = OX + (col - row) * TW / 2;
+        const vy = OY + (col + row) * TH / 2;
+
+        const dx = mx - vx, dy = my - vy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const vInfluence = Math.max(0, 1 - dist / (TW * 2.6));
+
+        const speed = v.speedIdle + vInfluence * v.speedBoost;
+        if (dt > 0) {
+          v.t += speed * dt * v.dir;
+          if (v.t > GRID) v.t -= GRID;
+          if (v.t < 0) v.t += GRID;
+        }
+
+        // Trail: keep the last few positions for a soft motion streak.
+        v.trail.unshift({ x: vx, y: vy });
+        if (v.trail.length > 6) v.trail.pop();
+
+        const [cr, cg, cb] = vehicleColors[v.colorIdx];
+        const baseOpacity = isDark ? 0.35 : 0.45;
+        const opacity = baseOpacity + vInfluence * 0.5;
+        const radius = 1.6 + vInfluence * 2.4;
+
+        // Trail (rendered oldest → newest, fading out)
+        for (let ti = v.trail.length - 1; ti >= 1; ti--) {
+          const p = v.trail[ti];
+          const trailT = 1 - ti / v.trail.length;
+          const tr = radius * (0.35 + trailT * 0.5);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, tr, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${cr},${cg},${cb},${opacity * trailT * 0.35})`;
+          ctx.fill();
+        }
+
+        // Soft glow halo
+        const gr = ctx.createRadialGradient(vx, vy, 0, vx, vy, radius * (3 + vInfluence * 3.5));
+        gr.addColorStop(0, `rgba(${cr},${cg},${cb},${opacity * 0.5})`);
+        gr.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+        ctx.fillStyle = gr;
+        ctx.beginPath();
+        ctx.arc(vx, vy, radius * (3 + vInfluence * 3.5), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(vx, vy, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${opacity})`;
+        ctx.fill();
+      });
+
+      // ── Floating micro-particles ────────────────────────────────────────
       for (let i = 0; i < 22; i++) {
         const px = W * 0.1 + (Math.sin(time * 0.16 + i * 2.3) * 0.5 + 0.5) * W * 0.82;
         const py = H * 0.04 + (Math.cos(time * 0.11 + i * 1.8) * 0.35 + 0.35) * H * 0.5;
@@ -319,17 +466,17 @@ export function HeroCity() {
         ctx.fill();
       }
 
-      // ── Bottom + left fog ────────────────────────────────────────────────────
+      // ── Bottom + left fog ────────────────────────────────────────────────
       const bfg = ctx.createLinearGradient(0, H * 0.68, 0, H);
-      bfg.addColorStop(0, isDark ? "rgba(3,8,20,0)" : "rgba(234,241,251,0)");
-      bfg.addColorStop(1, isDark ? "rgba(3,8,20,0.96)" : "rgba(220,232,248,0.97)");
+      bfg.addColorStop(0, isDark ? "rgba(5,5,5,0)" : "rgba(250,248,244,0)");
+      bfg.addColorStop(1, isDark ? "rgba(5,5,5,0.96)" : "rgba(242,237,229,0.97)");
       ctx.fillStyle = bfg;
       ctx.fillRect(0, H * 0.68, W, H * 0.32);
 
       // Left fade (text area stays clean)
       const lfg = ctx.createLinearGradient(0, 0, W * 0.38, 0);
-      lfg.addColorStop(0, isDark ? "rgba(3,8,20,0.85)" : "rgba(234,241,251,0.88)");
-      lfg.addColorStop(1, isDark ? "rgba(3,8,20,0)" : "rgba(234,241,251,0)");
+      lfg.addColorStop(0, isDark ? "rgba(5,5,5,0.85)" : "rgba(250,248,244,0.88)");
+      lfg.addColorStop(1, isDark ? "rgba(5,5,5,0)" : "rgba(250,248,244,0)");
       ctx.fillStyle = lfg;
       ctx.fillRect(0, 0, W * 0.38, H);
 
@@ -344,24 +491,23 @@ export function HeroCity() {
     };
     const onTouch = (e: TouchEvent) => {
       const rect = canvas.getBoundingClientRect();
-      const t = e.touches[0];
-      mouseRef.current = { x: t.clientX - rect.left, y: t.clientY - rect.top };
+      const tt = e.touches[0];
+      mouseRef.current = { x: tt.clientX - rect.left, y: tt.clientY - rect.top };
     };
     const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
+    const onResize = () => { resize(); };
 
     canvas.addEventListener("mousemove", onMove);
     canvas.addEventListener("mouseleave", onLeave);
     canvas.addEventListener("touchmove", onTouch, { passive: true });
-    window.addEventListener("resize", () => {
-      resize();
-      // rebuild buildings on resize
-    });
+    window.addEventListener("resize", onResize);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       canvas.removeEventListener("mousemove", onMove);
       canvas.removeEventListener("mouseleave", onLeave);
       canvas.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -370,66 +516,42 @@ export function HeroCity() {
       {/* Canvas background */}
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Text overlay — left 60%.
-          pointer-events-none is critical here: this wrapper spans the
-          FULL hero (inset-0), including the right-hand area where the
-          isometric city sits. Without it, this transparent layer sat on
-          top of the canvas and silently absorbed every mousemove event,
-          which is why the buildings never reacted to the cursor. */}
+      {/* Text overlay — left side, pointer-events-none so the canvas
+          underneath (including the city on the right) keeps receiving
+          mouse/touch input. */}
       <div className="pointer-events-none absolute inset-0 flex items-center">
         <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
-          <div className="w-full md:w-[60%]">
+          <div className="w-full md:w-[64%]">
 
-            {/* Eyebrow */}
-            <motion.p
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-7 text-[0.7rem] font-medium uppercase tracking-[0.32em] text-white/40 dark:text-white/38 light:text-slate-400"
-            >
-              {t("eyebrow")}
-            </motion.p>
-
-            {/* Main headline */}
+            {/* Headline — Inter Black, large enough to anchor the whole
+                first screen. Only the word "Smart" / "inteligente(s)"
+                gets the animated gradient + italic treatment; the rest
+                stays a solid, plain color. */}
             <h1
               aria-label={t("ariaLabel")}
-              className="font-hero font-semibold leading-[1.08] tracking-tight select-none"
-              style={{ fontSize: "clamp(2.4rem, 7vw, 5.8rem)" }}
+              className="font-hero font-black leading-[1.02] tracking-tight select-none"
+              style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
             >
               <motion.span
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 className="block text-white dark:text-white light-hero-text"
               >
-                {t("line1")}
+                {t("line1Pre")}
+                <span className="hero-word-gradient italic">{t("line1Highlight")}</span>
+                {t("line1Post")}
               </motion.span>
 
               <motion.span
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.78, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient font-bold"
+                transition={{ duration: 1, delay: 0.72, ease: [0.16, 1, 0.3, 1] }}
+                className="block text-white dark:text-white light-hero-text"
               >
-                {t("line2")}
-              </motion.span>
-
-              <motion.span
-                initial={{ opacity: 0, y: 32 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.91, ease: [0.16, 1, 0.3, 1] }}
-                className="block text-white/75 dark:text-white/72 light-hero-subtext"
-              >
-                {t("line3")}
-              </motion.span>
-
-              <motion.span
-                initial={{ opacity: 0, y: 32 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1.04, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient font-bold"
-              >
-                {t("line4")}
+                {t("line2Pre")}
+                <span className="hero-word-gradient italic">{t("line2Highlight")}</span>
+                {t("line2Post")}
               </motion.span>
             </h1>
 
@@ -437,13 +559,17 @@ export function HeroCity() {
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
-              transition={{ duration: 1.2, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.2, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
               className="mt-10 h-px w-16 bg-gradient-to-r from-hero-line to-transparent"
               style={{ transformOrigin: "left" }}
             />
           </div>
         </div>
       </div>
+
+      {/* Bottom glow — large, blurred, theme-adaptive semicircle that
+          blends the Hero into the section below. */}
+      <div aria-hidden className="hero-bottom-glow pointer-events-none absolute inset-x-0 bottom-0 h-[38vh]" />
 
       {/* Scroll indicator */}
       <motion.div
@@ -469,11 +595,11 @@ function getRainbowRgb(index: number, time: number): [number, number, number] {
   const s = 0.75, l = 0.6;
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
   const p = 2 * l - q;
-  const toRgb = (t: number) => {
-    if (t < 0) t += 1; if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+  const toRgb = (tt: number) => {
+    if (tt < 0) tt += 1; if (tt > 1) tt -= 1;
+    if (tt < 1/6) return p + (q - p) * 6 * tt;
+    if (tt < 1/2) return q;
+    if (tt < 2/3) return p + (q - p) * (2/3 - tt) * 6;
     return p;
   };
   return [
