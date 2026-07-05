@@ -1,41 +1,52 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { Sun, Moon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useRef, useState, type ReactNode, type MouseEvent } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface ThemeToggleProps { className?: string }
+interface MagneticButtonProps {
+  children: ReactNode;
+  onClick?: () => void;
+  className?: string;
+  strength?: number;
+  ariaLabel?: string;
+}
 
-export function ThemeToggle({ className }: ThemeToggleProps) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const t = useTranslations("theme");
+export function MagneticButton({
+  children,
+  onClick,
+  className,
+  strength = 0.35,
+  ariaLabel,
+}: MagneticButtonProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className={cn("h-9 w-9", className)} />;
+  const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width  / 2;
+    const y = e.clientY - rect.top  - rect.height / 2;
+    setOffset({ x: x * strength, y: y * strength });
+  };
 
-  const isDark = resolvedTheme === "dark";
+  const handleMouseLeave = () => setOffset({ x: 0, y: 0 });
 
   return (
-    <button
+    <motion.button
+      ref={ref}
       type="button"
-      aria-label={isDark ? t("toggleToLight") : t("toggleToDark")}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={ariaLabel}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: offset.x, y: offset.y }}
+      transition={{ type: "spring", stiffness: 150, damping: 12, mass: 0.3 }}
+      whileTap={{ scale: 0.96 }}
       className={cn(
-        "glass flex h-9 w-9 items-center justify-center rounded-full",
-        "text-ink-muted transition-all duration-[280ms] ease-out",
-        "hover:text-accent-primary hover:-translate-y-[1px] hover:brightness-110",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
-        className
-      )}
-    >
-      {isDark ? (
-        <Sun className="h-4 w-4" strokeWidth={1.6} />
-      ) : (
-        <Moon className="h-4 w-4" strokeWidth={1.6} />
-      )}
-    </button>
-  );
-}
+        "animated-border glass relative inline-flex items-center justify-center overflow-hidden",
+        "rounded-full px-5 py-2 text-[0.8rem] font-medium text-ink",
+        "transition-all duration-300 ease-out",
+        "hover:-translate-y-px hover:brightness-110",
+        "shadow-[0_0_0_rgba(24,194,156,0)]
