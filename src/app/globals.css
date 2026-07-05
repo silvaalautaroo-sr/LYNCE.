@@ -300,6 +300,32 @@ body {
 }
 
 /* ========================================================== */
+/* NAVBAR WORDMARK — vector asset, masked fill (dark + light)  */
+/* ========================================================== */
+
+/* The wordmark is rendered as a solid div shaped by a CSS mask
+   (mask-image: url(lynce-wordmark-mask.svg)), so its visible color
+   comes from `background` here rather than text-fill-color. */
+
+.navbar-wordmark-fill {
+  background: var(--ink);
+}
+
+.light .navbar-wordmark-fill {
+  background: linear-gradient(
+    108deg,
+    #e879f9 0%,
+    #818cf8 22%,
+    #38bdf8 45%,
+    #34d399 65%,
+    #fbbf24 82%,
+    #f87171 100%
+  );
+  background-size: 300% 100%;
+  animation: navbar-rainbow-sweep 4s linear infinite;
+}
+
+/* ========================================================== */
 /* HERO BOTTOM GLOW — large blurred semicircle blending into   */
 /* the next section                                            */
 /* ========================================================== */
