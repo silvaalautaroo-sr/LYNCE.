@@ -214,7 +214,7 @@ export function Section2Ecosystem() {
                 fontSize={dims.r * 0.08}
                 fontWeight="600"
                 letterSpacing="0.12em"
-                fontFamily="var(--font-space-grotesk), sans-serif"
+                fontFamily="var(--font-inter), sans-serif"
               >
                 {t("center")}
               </text>
