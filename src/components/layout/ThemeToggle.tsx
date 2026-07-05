@@ -6,9 +6,7 @@ import { Sun, Moon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-interface ThemeToggleProps {
-  className?: string;
-}
+interface ThemeToggleProps { className?: string }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
@@ -26,7 +24,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={isDark ? t("toggleToLight") : t("toggleToDark")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "glass flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition-all duration-300 hover:text-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
+        "glass flex h-9 w-9 items-center justify-center rounded-full",
+        "text-ink-muted transition-all duration-[280ms] ease-out",
+        "hover:text-accent-primary hover:-translate-y-[1px] hover:brightness-110",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
         className
       )}
     >
