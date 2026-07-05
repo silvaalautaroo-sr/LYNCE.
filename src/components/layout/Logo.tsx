@@ -7,75 +7,92 @@ import { useTheme } from "next-themes";
 export function Logo() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [heroH, setHeroH] = useState(800);
   const { scrollY } = useScroll();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    const update = () => setHeroH(window.innerHeight);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const isDark = !mounted || resolvedTheme !== "light";
-  const isLight = mounted && resolvedTheme === "light";
 
-  // ── "Absorbed behind the icon" animation ────────────────────────────────
-  // Driven entirely by transform + clip-path (never opacity/blur alone),
-  // over a short, snappy 0–130px scroll window so it reads as an instant,
-  // electric reaction the moment the user starts scrolling (~450ms of
-  // scroll-equivalent motion at typical wheel/trackpad speed).
-  const START = 0;
-  const END = 130;
+  // ── Scroll range: animation starts at 32% of hero, finishes at 72% ─────────
+  const s = heroH * 0.32;
+  const e = heroH * 0.72;
 
-  // Wordmark is "sucked" leftward into the icon: it slides left, compresses
-  // horizontally, and is clipped away from the right edge inward — a wipe,
-  // not a fade.
-  const textX = useTransform(scrollY, [START, END], [0, -22]);
-  const textScaleX = useTransform(scrollY, [START, END], [1, 0.4]);
-  const clipInset = useTransform(scrollY, [START, END], [0, 100]);
-  const clipPath = useTransform(clipInset, (v) => `inset(0 ${v}% 0 0)`);
+  // ── Icon: stays at initial size, grows very slightly once wordmark is hidden ─
+  const iconW = useTransform(scrollY, [s, e], [40, 44]);
+  const iconH = useTransform(scrollY, [s, e], [56, 62]);
 
-  // Icon "sparks" at the exact moment of absorption — a brief glow pulse
-  // (drop-shadow / filter, not opacity on the artwork itself) then settles
-  // into a very slightly larger, permanent state once scrolled.
-  const iconGlow = useTransform(scrollY, [START, END * 0.55, END], [0, 1, 0.35]);
-  const iconGlowFilter = useTransform(
-    iconGlow,
-    (v) => `drop-shadow(0 0 ${4 + v * 10}px rgba(24,194,156,${0.25 + v * 0.45}))`
+  // ── Wordmark clip — grows FROM THE RIGHT (E→L), text appears absorbed by icon
+  // "inset(top right bottom left)" — right inset grows → text erased right-to-left
+  const clipProgress = useTransform(scrollY, [s, e * 0.92], [0, 100]);
+  const wordmarkClip = useTransform(clipProgress, (v: number) =>
+    `inset(0 ${v.toFixed(2)}% 0 0 round 0px)`
   );
-  const iconScale = useTransform(scrollY, [START, END], [1, 1.08]);
 
-  const iconSrc = isDark
-    ? "/logo/lynx-icon-light.png"
-    : "/logo/lynx-icon-dark.png";
+  // ── Wordmark translates left (toward icon) as it disappears ─────────────────
+  const wordmarkX = useTransform(scrollY, [s, e], [0, -10]);
+
+  // ── Wordmark vertical scale: subtle vertical compression at the end ───────────
+  const wordmarkScaleY = useTransform(scrollY, [s * 1.3, e], [1, 0.82]);
+
+  const iconSrc     = isDark ? "/logo/lynx-icon-light.png"      : "/logo/lynx-icon-dark.png";
+  const wordmarkSrc = isDark ? "/logo/lynce-wordmark-light.png" : "/logo/lynce-wordmark-dark.png";
+
+  // Wordmark natural height to match icon
+  const wmDisplayH = 36;
+  // 691×208 → keep ratio
+  const wmDisplayW = Math.round(wmDisplayH * (691 / 208));
 
   return (
-    <div className="flex items-center gap-2.5 select-none">
-      {/* Lynx icon — the wordmark visually collapses into this */}
+    <div className="flex items-center gap-3 select-none">
+      {/* ── Lynx icon — always visible ──────────────────────────────────────── */}
       <motion.div
-        className="relative h-[40px] w-[40px] flex-shrink-0"
-        style={{ scale: iconScale, filter: iconGlowFilter }}
+        className="relative flex-shrink-0"
+        style={{ width: iconW, height: iconH }}
       >
         {mounted && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={iconSrc}
-            alt="Lynce"
+            alt="Lynce icon"
             className="h-full w-full object-contain"
           />
         )}
       </motion.div>
 
-      {/* LYNCE wordmark — absorbed behind the icon via clip-path + transform */}
-      <motion.span
-        style={{
-          x: textX,
-          scaleX: textScaleX,
-          clipPath,
-          transformOrigin: "left center",
-        }}
-        className={[
-          "text-[1.18rem] font-semibold whitespace-nowrap",
-          isLight ? "navbar-wordmark-rainbow" : "text-ink",
-        ].join(" ")}
-      >
-        LYNCE
-      </motion.span>
+      {/* ── Official LYNCE wordmark — clips away on scroll ──────────────────── */}
+      {mounted && (
+        <motion.div
+          style={{
+            x: wordmarkX,
+            scaleY: wordmarkScaleY,
+            clipPath: wordmarkClip,
+            transformOrigin: "left center",
+            // Ensure crisp rendering
+            willChange: "clip-path, transform",
+          }}
+          className="flex-shrink-0 overflow-visible"
+        >
+          <img
+            src={wordmarkSrc}
+            alt="LYNCE"
+            width={wmDisplayW}
+            height={wmDisplayH}
+            className="object-contain"
+            style={{
+              height: wmDisplayH,
+              width: wmDisplayW,
+              display: "block",
+            }}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }
