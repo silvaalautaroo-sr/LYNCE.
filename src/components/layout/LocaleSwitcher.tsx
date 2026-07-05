@@ -9,8 +9,8 @@ interface LocaleSwitcherProps {
 }
 
 export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
-  const locale = useLocale();
-  const router = useRouter();
+  const locale  = useLocale();
+  const router  = useRouter();
   const pathname = usePathname();
 
   const switchLocale = (next: string) => {
@@ -20,18 +20,24 @@ export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
   return (
     <div
       className={cn(
-        "glass flex items-center gap-px rounded-full px-1 py-1 text-xs font-medium",
+        "glass flex items-center gap-px rounded-full px-1 py-1",
         className
       )}
+      style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}
     >
-      {(["es", "en"] as const).map((l) => (
+      {(["en", "es"] as const).map((l) => (
         <button
           key={l}
           type="button"
           aria-label={l === "es" ? "Español" : "English"}
           onClick={() => switchLocale(l)}
           className={cn(
-            "rounded-full px-3 py-1.5 transition-all duration-300",
+            // Base
+            "rounded-full px-3 py-1.5 text-[0.72rem] font-medium tracking-[-0.01em]",
+            "transition-all duration-[280ms] ease-out",
+            // Hover
+            "hover:-translate-y-[1px] hover:brightness-110",
+            // Active locale
             locale === l
               ? "bg-accent-primary/20 text-accent-primary"
               : "text-ink-muted hover:text-ink"
