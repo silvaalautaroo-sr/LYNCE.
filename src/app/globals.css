@@ -5,18 +5,18 @@
 :root {
   /* ---- Lynce dark theme (default) ---- */
   --bg-primary: #050505;
-  --bg-secondary: #081a2e;
+  --bg-secondary: #090909;
   --accent-primary: #18c29c;
   --accent-secondary: #53e4e1;
 
-  --ink: #f4f7f6;
-  --ink-muted: rgba(244, 247, 246, 0.68);
-  --ink-faint: rgba(244, 247, 246, 0.4);
+  --ink: #ffffff;
+  --ink-muted: rgba(255, 255, 255, 0.68);
+  --ink-faint: rgba(255, 255, 255, 0.4);
 
-  --border-soft: rgba(244, 247, 246, 0.12);
+  --border-soft: rgba(255, 255, 255, 0.12);
   --glass-bg: rgba(255, 255, 255, 0.04);
   --glass-bg-strong: rgba(255, 255, 255, 0.06);
-  --grid-line: rgba(244, 247, 246, 0.05);
+  --grid-line: rgba(255, 255, 255, 0.05);
 
   --header-bg: rgba(5, 5, 5, 0.55);
   --shadow-glow: 0 0 40px rgba(24, 194, 156, 0.18);
@@ -26,21 +26,21 @@
 
 .light {
   /* ---- Lynce light theme ---- */
-  --bg-primary: #f6f8f8;
-  --bg-secondary: #e9f2f1;
+  --bg-primary: #f7f5f2;
+  --bg-secondary: #efece6;
   --accent-primary: #0e9d80;
   --accent-secondary: #1bb9bb;
 
-  --ink: #06141f;
-  --ink-muted: rgba(6, 20, 31, 0.66);
-  --ink-faint: rgba(6, 20, 31, 0.42);
+  --ink: #0a0a0a;
+  --ink-muted: rgba(10, 10, 10, 0.66);
+  --ink-faint: rgba(10, 10, 10, 0.42);
 
-  --border-soft: rgba(6, 20, 31, 0.1);
+  --border-soft: rgba(10, 10, 10, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-bg-strong: rgba(255, 255, 255, 0.72);
-  --grid-line: rgba(6, 20, 31, 0.06);
+  --grid-line: rgba(10, 10, 10, 0.06);
 
-  --header-bg: rgba(246, 248, 248, 0.6);
+  --header-bg: rgba(247, 245, 242, 0.6);
   --shadow-glow: 0 0 40px rgba(14, 157, 128, 0.14);
 
   color-scheme: light;
@@ -186,31 +186,33 @@ body {
 
 .hero-word-gradient {
   background: linear-gradient(
-    108deg,
-    #6366f1 0%,
-    #818cf8 22%,
-    #06b6d4 55%,
-    #3b82f6 80%,
-    #8b5cf6 100%
+    100deg,
+    #18c29c 0%,
+    #2bff9c 16%,
+    #53e4e1 34%,
+    #ffffff 50%,
+    #6ea8ff 66%,
+    #a78bfa 84%,
+    #18c29c 100%
   );
-  background-size: 220% 100%;
+  background-size: 280% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: hero-gradient-drift 6s ease-in-out infinite alternate;
+  animation: hero-gradient-drift 8s ease-in-out infinite alternate;
 }
 
 .light .hero-word-gradient {
   background: linear-gradient(
-    108deg,
-    #e879f9, #818cf8, #38bdf8, #34d399,
-    #fbbf24, #fb923c, #f87171, #e879f9
+    100deg,
+    #f4a6c1, #f7c98e, #f4e08a, #a8e0b8,
+    #9fd6e8, #b3aaf0, #f4a6c1
   );
-  background-size: 400% 100%;
+  background-size: 380% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: hero-gradient-rainbow 3.5s linear infinite;
+  animation: hero-gradient-rainbow 8s ease-in-out infinite alternate;
 }
 
 @keyframes hero-gradient-drift {
@@ -295,4 +297,33 @@ body {
 @keyframes navbar-rainbow-sweep {
   0%   { background-position: 0%   50%; }
   100% { background-position: 300% 50%; }
+}
+
+/* ========================================================== */
+/* HERO BOTTOM GLOW — large blurred semicircle blending into   */
+/* the next section                                            */
+/* ========================================================== */
+
+.hero-bottom-glow {
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(24, 194, 156, 0.32) 0%,
+    rgba(83, 228, 225, 0.18) 32%,
+    rgba(99, 102, 241, 0.1) 55%,
+    rgba(5, 5, 5, 0) 78%
+  );
+  filter: blur(48px);
+  opacity: 0.9;
+}
+
+.light .hero-bottom-glow {
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(244, 166, 193, 0.35) 0%,
+    rgba(159, 214, 232, 0.28) 30%,
+    rgba(179, 170, 240, 0.18) 55%,
+    rgba(247, 245, 242, 0) 78%
+  );
+  filter: blur(48px);
+  opacity: 0.85;
 }
