@@ -26,8 +26,8 @@ export function MagneticButton({
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width  / 2;
-    const y = e.clientY - rect.top  - rect.height / 2;
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
     setOffset({ x: x * strength, y: y * strength });
   };
 
@@ -45,8 +45,12 @@ export function MagneticButton({
       transition={{ type: "spring", stiffness: 150, damping: 12, mass: 0.3 }}
       whileTap={{ scale: 0.96 }}
       className={cn(
-        "animated-border glass relative inline-flex items-center justify-center overflow-hidden",
-        "rounded-full px-5 py-2 text-[0.8rem] font-medium text-ink",
-        "transition-all duration-300 ease-out",
-        "hover:-translate-y-px hover:brightness-110",
-        "shadow-[0_0_0_rgba(24,194,156,0)]
+        "animated-border glass relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2 text-sm font-medium text-ink transition-all duration-300 ease-out hover:-translate-y-px hover:brightness-110",
+        className
+      )}
+      style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}
+    >
+      <span className="relative z-10">{children}</span>
+    </motion.button>
+  );
+}
