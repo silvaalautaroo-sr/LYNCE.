@@ -24,13 +24,15 @@
   "cta": {
     "talkToUs": "Talk to us"
   },
-  "hero": {
-    "eyebrow": "Urban Intelligence Layer",
-    "line1": "Things",
-    "line2": "Smart",
-    "line3": "Cities",
-    "line4": "Smart.",
-    "ariaLabel": "Smart things, smart cities"
+"hero": {
+  "ariaLabel": "Smart Sight for Smart Cities",
+  "line1Pre": "",
+  "line1Highlight": "Smart",
+  "line1Post": " Sight",
+  "line2Pre": "for ",
+  "line2Highlight": "Smart",
+  "line2Post": " Cities"
+}
   },
   "section1": {
     "eyebrow": "The problem",
