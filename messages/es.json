@@ -24,13 +24,14 @@
   "cta": {
     "talkToUs": "Habla con nosotros"
   },
-  "hero": {
-    "eyebrow": "Urban Intelligence Layer",
-    "line1": "Cosas",
-    "line2": "inteligentes",
-    "line3": "para ciudades",
-    "line4": "inteligentes.",
-    "ariaLabel": "Cosas inteligentes para ciudades inteligentes"
+ "hero": {
+  "ariaLabel": "Visión inteligente para ciudades inteligentes",
+  "line1Pre": "Visión ",
+  "line1Highlight": "inteligente",
+  "line1Post": "",
+  "line2Pre": "para ciudades ",
+  "line2Highlight": "inteligentes",
+  "line2Post": "."
   },
   "section1": {
     "eyebrow": "El problema",
