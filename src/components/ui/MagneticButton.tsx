@@ -1,57 +1,41 @@
 "use client";
 
-import { useRef, useState, type ReactNode, type MouseEvent } from "react";
-import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { Sun, Moon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-interface MagneticButtonProps {
-  children: ReactNode;
-  onClick?: () => void;
-  className?: string;
-  strength?: number;
-  as?: "button" | "div";
-  ariaLabel?: string;
-}
+interface ThemeToggleProps { className?: string }
 
-export function MagneticButton({
-  children,
-  onClick,
-  className,
-  strength = 0.35,
-  ariaLabel,
-}: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+export function ThemeToggle({ className }: ThemeToggleProps) {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const t = useTranslations("theme");
 
-  const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    setOffset({ x: x * strength, y: y * strength });
-  };
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return <div className={cn("h-9 w-9", className)} />;
 
-  const handleMouseLeave = () => setOffset({ x: 0, y: 0 });
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <motion.button
-      ref={ref}
+    <button
       type="button"
-      aria-label={ariaLabel}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      animate={{ x: offset.x, y: offset.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 12, mass: 0.3 }}
-      whileTap={{ scale: 0.96 }}
+      aria-label={isDark ? t("toggleToLight") : t("toggleToDark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "animated-border glass relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-2.5 text-sm font-medium text-ink shadow-[0_0_0_rgba(24,194,156,0)] transition-shadow duration-500 hover:shadow-[var(--shadow-glow)]",
+        "glass flex h-9 w-9 items-center justify-center rounded-full",
+        "text-ink-muted transition-all duration-[280ms] ease-out",
+        "hover:text-accent-primary hover:-translate-y-[1px] hover:brightness-110",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
         className
       )}
     >
-      <span className="relative z-[2]">{children}</span>
-      <span className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-accent-primary/0 via-accent-secondary/10 to-accent-primary/0 opacity-0 transition-opacity duration-500 hover:opacity-100" />
-    </motion.button>
+      {isDark ? (
+        <Sun className="h-4 w-4" strokeWidth={1.6} />
+      ) : (
+        <Moon className="h-4 w-4" strokeWidth={1.6} />
+      )}
+    </button>
   );
 }
