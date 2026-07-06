@@ -349,7 +349,7 @@ export function HeroCity() {
           <div className="w-full md:w-[62%]">
 
             <h1
-              aria-label={`${t("line1")} ${t("line2")} ${t("line3")} ${t("line4")}`}
+              aria-label={t("ariaLabel")}
               className="tracking-tight select-none"
               style={{
                 fontFamily: "var(--font-inter), Inter, sans-serif",
@@ -364,49 +364,27 @@ export function HeroCity() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 className="block"
-                style={{
-                  color: "var(--ink)",
-                  fontStyle: "italic",
-                  fontWeight: 900,
-                }}
+                style={{ color: "var(--ink)", fontWeight: 900 }}
               >
-                {t("line1")}
+                {t("line1Pre")}
+                <span className="hero-word-gradient" style={{ fontStyle: "italic" }}>
+                  {t("line1Highlight")}
+                </span>
+                {t("line1Post")}
               </motion.span>
 
               <motion.span
                 initial={{ opacity: 0, y: 36 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
-                style={{ fontWeight: 900 }}
-              >
-                {t("line2")}
-              </motion.span>
-
-              <motion.span
-                initial={{ opacity: 0, y: 36 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1, delay: 0.72, ease: [0.16, 1, 0.3, 1] }}
                 className="block"
-                style={{
-                  fontSize: "0.76em",
-                  color: "var(--ink-muted)",
-                  fontWeight: 900,
-                }}
+                style={{ color: "var(--ink)", fontWeight: 900 }}
               >
-                {t("line3")}
-              </motion.span>
-
-              <motion.span
-                initial={{ opacity: 0, y: 36 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
-                style={{ fontSize: "0.76em", fontWeight: 900 }}
-              >
-                <span style={{ fontStyle: "italic" }}>Smart</span>
-                {" "}
-                <span style={{ fontStyle: "normal" }}>Cities</span>
+                {t("line2Pre")}
+                <span className="hero-word-gradient" style={{ fontStyle: "italic" }}>
+                  {t("line2Highlight")}
+                </span>
+                {t("line2Post")}
               </motion.span>
             </h1>
 
