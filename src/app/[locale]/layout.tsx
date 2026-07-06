@@ -17,12 +17,14 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-// Inter for navigation elements — Apple / Linear / Vercel feel
+// Inter — now includes weight 900 (Black) AND italic style,
+// required by the Hero headline ("Smart Sight for Smart Cities")
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
 });
 
 export async function generateStaticParams() {
