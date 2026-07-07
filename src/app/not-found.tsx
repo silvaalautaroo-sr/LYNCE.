@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { routing } from "@/i18n/routing";
+
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
@@ -7,12 +10,12 @@ export default function NotFound() {
       <h1 className="text-4xl font-medium tracking-tight text-ink">
         Page not found
       </h1>
-      <a
-        href="/es"
+      <Link
+        href={`/${routing.defaultLocale}`}
         className="mt-4 text-sm text-accent-primary transition-opacity hover:opacity-80"
       >
         ← Go home
-      </a>
+      </Link>
     </div>
   );
 }
