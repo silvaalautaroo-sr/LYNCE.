@@ -1,7 +1,13 @@
 {
   "meta": {
-    "title": "Lynce — Smart things for smart cities",
+    "title": "Lynce — Smart Sight for Smart Cities",
     "description": "Lynce connects every technology, every company and every data source in the city into one intelligent ecosystem."
+  },
+  "hero": {
+    "line1": "Smart",
+    "line2": "Sight",
+    "line3": "for",
+    "line4": "Smart Cities"
   },
   "nav": {
     "platform": "Platform",
@@ -23,15 +29,6 @@
   },
   "cta": {
     "talkToUs": "Talk to us"
-  },
-"hero": {
-  "ariaLabel": "Smart Sight for Smart Cities",
-  "line1Pre": "",
-  "line1Highlight": "Smart",
-  "line1Post": " Sight",
-  "line2Pre": "for ",
-  "line2Highlight": "Smart",
-  "line2Post": " Cities"
   },
   "section1": {
     "eyebrow": "The problem",
