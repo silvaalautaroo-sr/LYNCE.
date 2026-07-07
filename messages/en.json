@@ -11,106 +11,119 @@
     "line4Part2": "Cities"
   },
   "nav": {
-    "platform": "Plataforma",
-    "ecosystem": "Ecosistema",
-    "technology": "Tecnología",
-    "vision": "Visión",
-    "about": "Nosotros",
-    "contact": "Contacto",
+    "platform": "Platform",
+    "ecosystem": "Ecosystem",
+    "technology": "Technology",
+    "vision": "Vision",
+    "about": "About",
+    "contact": "Contact",
     "brand": "Lynce"
   },
   "theme": {
-    "toggleToLight": "Cambiar a modo claro",
-    "toggleToDark": "Cambiar a modo oscuro"
+    "toggleToLight": "Switch to light mode",
+    "toggleToDark": "Switch to dark mode"
   },
   "language": {
-    "label": "Idioma",
+    "label": "Language",
     "es": "ES",
     "en": "EN"
   },
   "cta": {
-    "talkToUs": "Habla con nosotros"
+    "talkToUs": "Talk to us"
   },
   "section1": {
-    "eyebrow": "El problema",
-    "headlineLine1": "Las ciudades no necesitan más tecnología.",
-    "headlineLine2": "Necesitan tecnologías que trabajen juntas.",
-    "body": "Hoy cientos de empresas construyen tecnología inteligente para las ciudades: tránsito, residuos, iluminación, energía, agua, movilidad, monitoreo ambiental. Cada una resuelve su parte. Pero cada plataforma vive aislada, hablando un idioma distinto, sin ver a las demás. El resultado no es una ciudad inteligente. Es una colección de sistemas inteligentes que no se hablan entre sí."
+    "eyebrow": "The problem",
+    "headlineLine1": "Cities don't need more technology.",
+    "headlineLine2": "They need technologies that work together.",
+    "body": "Today, hundreds of companies build smart technology for cities: traffic, waste, lighting, energy, water, mobility, environmental monitoring. Each one solves its own piece. But every platform lives in isolation, speaking a different language, blind to the rest. The result isn't a smart city. It's a collection of smart systems that don't talk to each other.",
+    "tags": [
+      "Traffic", "Waste", "Lighting", "Energy",
+      "Water", "Mobility", "IoT", "AI", "GIS",
+      "Satellites", "Blockchain", "Monitoring"
+    ]
   },
   "ecosystem": {
-    "eyebrow": "Qué hace Lynce",
-    "title": "Todo se conecta a través de Lynce",
-    "subtitle": "Una capa de interoperabilidad donde cada tecnología, cada empresa y cada fuente de datos encuentra su lugar.",
+    "eyebrow": "What Lynce does",
+    "title": "Everything connects through Lynce",
+    "subtitle": "An interoperability layer where every technology, every company, and every data source finds its place.",
     "center": "Lynce",
     "nodes": {
-      "ai": "Inteligencia Artificial",
+      "ai": "Artificial Intelligence",
       "iot": "IoT",
       "blockchain": "Blockchain",
-      "satellites": "Satélites",
-      "utilities": "Servicios Públicos",
-      "infrastructure": "Infraestructura",
-      "publicServices": "Servicios al Ciudadano",
-      "industries": "Industrias",
-      "governments": "Gobiernos",
-      "municipalities": "Municipios"
+      "satellites": "Satellites",
+      "utilities": "Utilities",
+      "infrastructure": "Infrastructure",
+      "publicServices": "Public Services",
+      "industries": "Industries",
+      "governments": "Governments",
+      "municipalities": "Municipalities"
     }
   },
   "platform": {
-    "eyebrow": "Plataforma",
-    "title": "De sistemas aislados a inteligencia unificada",
-    "stepDisconnected": "Tecnologías desconectadas",
-    "stepDisconnectedNote": "Cada proveedor, cada protocolo, cada panel por separado.",
+    "eyebrow": "Platform",
+    "title": "From isolated systems to unified intelligence",
+    "stepDisconnected": "Disconnected technologies",
+    "stepDisconnectedNote": "Every vendor, every protocol, every dashboard on its own.",
     "stepLynce": "Lynce",
-    "stepLynceNote": "Una capa común que traduce, sincroniza y conecta.",
-    "stepUnified": "Inteligencia unificada",
-    "stepUnifiedNote": "Una sola vista. Una sola ciudad que piensa como un todo."
+    "stepLynceNote": "A common layer that translates, synchronizes, and connects.",
+    "stepUnified": "Unified intelligence",
+    "stepUnifiedNote": "One single view. One city that thinks as a whole."
   },
   "ownSolutions": {
-    "eyebrow": "Soluciones propias",
-    "title": "Lynce también construye",
-    "body": "Mientras conectamos al ecosistema, desarrollamos nuestras propias soluciones de ciudad inteligente: el primer paso para demostrar lo que es posible cuando la tecnología trabaja en conjunto.",
-    "note": "El objetivo final no cambia: ser la capa que conecta a todos los demás."
+    "eyebrow": "Our own solutions",
+    "title": "Lynce also builds",
+    "body": "While we connect the ecosystem, we also develop our own smart city solutions — the first step in proving what's possible when technology works together.",
+    "note": "The end goal stays the same: to be the layer that connects everyone else.",
+    "items": {
+      "wildfire": "Wildfire detection",
+      "water": "Water management",
+      "energy": "Energy grid monitoring",
+      "traffic": "Smart traffic",
+      "urban": "Urban intelligence",
+      "satellite": "Satellite analytics"
+    }
   },
   "technology": {
-    "eyebrow": "Tecnología",
-    "title": "Construido sobre una base abierta",
+    "eyebrow": "Technology",
+    "title": "Built on an open foundation",
     "items": {
       "ai": {
-        "name": "Inteligencia Artificial",
-        "description": "Modelos que detectan patrones entre sistemas que antes nunca se cruzaban."
+        "name": "Artificial Intelligence",
+        "description": "Models that detect patterns across systems that never used to intersect."
       },
       "iot": {
         "name": "IoT",
-        "description": "Miles de sensores, un mismo lenguaje de datos en tiempo real."
+        "description": "Thousands of sensors, one shared real-time data language."
       },
       "blockchain": {
         "name": "Blockchain",
-        "description": "Trazabilidad y confianza entre organismos que no se conocen entre sí."
+        "description": "Traceability and trust between organizations that don't otherwise know each other."
       },
       "satellites": {
-        "name": "Satélites",
-        "description": "Visión territorial a gran escala, integrada con lo que ocurre en el terreno."
+        "name": "Satellites",
+        "description": "Large-scale territorial vision, integrated with what's happening on the ground."
       },
       "cloud": {
         "name": "Cloud",
-        "description": "Infraestructura elástica que escala con cada nueva ciudad conectada."
+        "description": "Elastic infrastructure that scales with every new city that connects."
       },
       "edge": {
         "name": "Edge Computing",
-        "description": "Decisiones en milisegundos, donde realmente importan: en el borde de la red."
+        "description": "Millisecond decisions, made right where they matter: at the edge of the network."
       }
     }
   },
   "vision": {
-    "eyebrow": "Visión",
-    "statement": "El futuro de las ciudades inteligentes no depende de más tecnología. Depende de que la tecnología deje de competir y empiece a colaborar.",
-    "subtext": "Lynce existe para ser esa colaboración."
+    "eyebrow": "Vision",
+    "statement": "The future of smart cities doesn't depend on more technology. It depends on technology stepping away from competition and starting to collaborate.",
+    "subtext": "Lynce exists to be that collaboration."
   },
   "footer": {
-    "tagline": "Cosas inteligentes para ciudades inteligentes.",
-    "navTitle": "Navegación",
-    "contactTitle": "Contacto",
+    "tagline": "Smart things for smart cities.",
+    "navTitle": "Navigation",
+    "contactTitle": "Contact",
     "email": "hola@lynce.tech",
-    "rights": "Todos los derechos reservados."
+    "rights": "All rights reserved."
   }
 }
