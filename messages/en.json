@@ -3,11 +3,13 @@
     "title": "Lynce — Smart Sight for Smart Cities",
     "description": "Lynce connects every technology, every company and every data source in the city into one intelligent ecosystem."
   },
-  "hero": {
-    "line1": "Smart",
-    "line2": "Sight",
-    "line3": "for",
-    "line4": "Smart Cities"
+ "hero": {
+  "line1": "Smart",
+  "line2": "Sight",
+  "line3": "for",
+  "line4Part1": "Smart",
+  "line4Part2": "Cities"
+},
   },
   "nav": {
     "platform": "Platform",
