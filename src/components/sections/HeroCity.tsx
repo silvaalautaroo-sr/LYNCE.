@@ -361,7 +361,11 @@ export function HeroCity() {
         <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
           <div className="w-full md:w-[62%]">
 
-            {/* Main headline — ALL 4 lines share the exact same font-size */}
+            {/* Main headline — 2 lines: "Smart Sight" / "for Smart Cities".
+                Only the word "Smart" (both occurrences) carries the
+                animated gradient + italic treatment; everything else is
+                solid Inter Black in --ink (white on dark, near-black on
+                light — same treatment both instances). */}
             <h1
               aria-label={`${t("line1")} ${t("line2")} ${t("line3")} ${t("line4Part1")} ${t("line4Part2")}`}
               className="tracking-tight select-none"
@@ -373,49 +377,31 @@ export function HeroCity() {
                 paddingBottom: "0.08em",
               }}
             >
-              {/* Line 1 — italic accent color */}
+              {/* Line 1 — "Smart Sight" */}
               <motion.span
                 initial={{ opacity: 0, y: 36 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 className="block"
-                style={{ color: "var(--ink)", fontStyle: "italic", fontWeight: 900 }}
               >
-                {t("line1")}
+                <span className="hero-word-gradient" style={{ fontStyle: "italic" }}>
+                  {t("line1")}
+                </span>{" "}
+                <span style={{ color: "var(--ink)" }}>{t("line2")}</span>
               </motion.span>
 
-              {/* Line 2 — gradient accent */}
+              {/* Line 2 — "for Smart Cities" */}
               <motion.span
                 initial={{ opacity: 0, y: 36 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
-                style={{ fontWeight: 900 }}
-              >
-                {t("line2")}
-              </motion.span>
-
-              {/* Line 3 — plain, SAME size as the rest */}
-              <motion.span
-                initial={{ opacity: 0, y: 36 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
                 className="block"
-                style={{ color: "var(--ink-muted)", fontWeight: 900 }}
               >
-                {t("line3")}
-              </motion.span>
-
-              {/* Line 4 — gradient accent, split into two translatable parts */}
-              <motion.span
-                initial={{ opacity: 0, y: 36 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-                className="block hero-word-gradient"
-                style={{ fontWeight: 900 }}
-              >
-                <span style={{ fontStyle: "italic" }}>{t("line4Part1")}</span>{" "}
-                <span style={{ fontStyle: "normal" }}>{t("line4Part2")}</span>
+                <span style={{ color: "var(--ink)" }}>{t("line3")}</span>{" "}
+                <span className="hero-word-gradient" style={{ fontStyle: "italic" }}>
+                  {t("line4Part1")}
+                </span>{" "}
+                <span style={{ color: "var(--ink)" }}>{t("line4Part2")}</span>
               </motion.span>
             </h1>
 
