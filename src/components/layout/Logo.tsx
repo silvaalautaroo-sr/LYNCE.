@@ -79,6 +79,7 @@ export function Logo() {
           }}
           className="flex-shrink-0 overflow-visible"
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={wordmarkSrc}
             alt="LYNCE"
