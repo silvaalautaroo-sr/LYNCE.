@@ -97,6 +97,8 @@ export function Section6Vision() {
             <span className="relative z-[2]">hola@lynce.tech</span>
           </a>
         </motion.div>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
