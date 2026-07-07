@@ -105,7 +105,7 @@ export function Section2Ecosystem() {
 
   return (
     <section
-      id="platform"
+      id="ecosystem"
       className="relative overflow-hidden py-32 lg:py-40"
     >
       <div className="container mx-auto max-w-6xl px-6">
@@ -214,7 +214,7 @@ export function Section2Ecosystem() {
                 fontSize={dims.r * 0.08}
                 fontWeight="600"
                 letterSpacing="0.12em"
-                fontFamily="var(--font-inter), inter black"
+                fontFamily="var(--font-inter), sans-serif"
               >
                 {t("center")}
               </text>
