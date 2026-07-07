@@ -30,7 +30,7 @@ export function Section5Technology() {
 
   return (
     <section
-      id="vision"
+      id="technology"
       className="relative overflow-hidden py-32 lg:py-40"
     >
       <div className="container mx-auto max-w-6xl px-6">
