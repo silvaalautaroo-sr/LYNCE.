@@ -15,7 +15,7 @@ export function Section1Problem() {
 
   return (
     <section
-      id="ecosystem"
+      id="problem"
       className="relative overflow-hidden py-32 lg:py-40"
     >
       <div className="container mx-auto max-w-6xl px-6">
@@ -62,15 +62,9 @@ export function Section1Problem() {
                   initial={{ opacity: 0, scale: 0.7 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{
-                    duration: 0.6,
-                    delay: 0.05 * i,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
                   animate={{
                     y: [0, (i % 2 === 0 ? -6 : 6), 0],
                   }}
-                  // @ts-expect-error framer-motion transition typing
                   transition={{
                     y: {
                       duration: 3 + i * 0.4,
