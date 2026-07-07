@@ -10,7 +10,12 @@ export function Section6Vision() {
   const words = t("statement").split(" ");
 
   return (
-    <section id="contact" className="relative overflow-hidden py-40 lg:py-56">
+    <section id="vision" className="relative overflow-hidden py-40 lg:py-56">
+      {/* Anchor kept for the header CTA and footer "contact" link — this
+          closing section doubles as the site's contact point (mailto CTA
+          below), so it's addressable both as #vision and #contact. */}
+      <span id="contact" className="absolute -top-24" aria-hidden="true" />
+
       {/* Soft radial glow behind text */}
       <div
         aria-hidden="true"
@@ -85,7 +90,7 @@ export function Section6Vision() {
           transition={{ duration: 0.7, delay: 1, ease: [0.16, 1, 0.3, 1] }}
           className="mt-14"
         >
-          <a
+          
             href="mailto:hola@lynce.tech"
             className="animated-border glass inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-medium text-ink shadow-[0_0_0_rgba(24,194,156,0)] transition-all duration-500 hover:shadow-[var(--shadow-glow)]"
           >
