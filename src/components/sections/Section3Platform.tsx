@@ -57,7 +57,7 @@ export function Section3Platform() {
 
   return (
     <section
-      id="technology"
+      id="platform"
       className="relative overflow-hidden py-32 lg:py-40"
     >
       <div className="container mx-auto max-w-4xl px-6">
