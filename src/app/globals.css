@@ -3,11 +3,20 @@
 @tailwind utilities;
 
 :root {
-  /* ---- Lynce dark theme (default) ---- */
-  --bg-primary: #050505;
-  --bg-secondary: #090909;
-  --accent-primary: #18c29c;
-  --accent-secondary: #53e4e1;
+  /* ---- Lynce dark theme (default) — flat, matches the Hero's own dark backdrop ---- */
+  --bg-primary: #02060e;
+  --bg-secondary: #060b18;
+  --accent-primary: #18c29c;   /* verde */
+  --accent-secondary: #53e4e1; /* celeste */
+  --accent-tertiary: #ffffff;  /* blanco */
+
+  --accent-primary-rgb: 24, 194, 156;
+  --accent-secondary-rgb: 83, 228, 225;
+  --accent-tertiary-rgb: 255, 255, 255;
+
+  /* Palabras clave — frío: verde -> celeste -> blanco */
+  --keyword-gradient: linear-gradient(100deg, #18c29c 0%, #53e4e1 55%, #ffffff 100%);
+  --bg-glow-color: rgba(24, 194, 156, 0.14);
 
   --ink: #ffffff;
   --ink-muted: rgba(255, 255, 255, 0.68);
@@ -18,30 +27,39 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.06);
   --grid-line: rgba(255, 255, 255, 0.05);
 
-  --header-bg: rgba(5, 5, 5, 0.55);
+  --header-bg: rgba(2, 6, 14, 0.55);
   --shadow-glow: 0 0 40px rgba(24, 194, 156, 0.18);
 
   color-scheme: dark;
 }
 
 .light {
-  /* ---- Lynce light theme ---- */
-  --bg-primary: #f7f5f2;
-  --bg-secondary: #efece6;
-  --accent-primary: #0e9d80;
-  --accent-secondary: #1bb9bb;
+  /* ---- Lynce light theme — flat, matches the Hero's own light backdrop ---- */
+  --bg-primary: #e3edfa;
+  --bg-secondary: #d3e1f5;
+  --accent-primary: #e8834f;   /* naranja */
+  --accent-secondary: #f2739c; /* rosa */
+  --accent-tertiary: #a8a29e;  /* gris cálido */
 
-  --ink: #0a0a0a;
-  --ink-muted: rgba(10, 10, 10, 0.66);
-  --ink-faint: rgba(10, 10, 10, 0.42);
+  --accent-primary-rgb: 232, 131, 79;
+  --accent-secondary-rgb: 242, 115, 156;
+  --accent-tertiary-rgb: 168, 162, 158;
 
-  --border-soft: rgba(10, 10, 10, 0.1);
+  /* Palabras clave — cálido: naranja -> rosa -> gris */
+  --keyword-gradient: linear-gradient(100deg, #e8834f 0%, #f2739c 55%, #a8a29e 100%);
+  --bg-glow-color: rgba(232, 131, 79, 0.12);
+
+  --ink: #000000;
+  --ink-muted: rgba(0, 0, 0, 0.66);
+  --ink-faint: rgba(0, 0, 0, 0.42);
+
+  --border-soft: rgba(0, 0, 0, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-bg-strong: rgba(255, 255, 255, 0.72);
-  --grid-line: rgba(10, 10, 10, 0.06);
+  --grid-line: rgba(0, 0, 0, 0.06);
 
-  --header-bg: rgba(247, 245, 242, 0.6);
-  --shadow-glow: 0 0 40px rgba(14, 157, 128, 0.14);
+  --header-bg: rgba(227, 237, 250, 0.6);
+  --shadow-glow: 0 0 40px rgba(232, 131, 79, 0.16);
 
   color-scheme: light;
 }
@@ -178,6 +196,21 @@ body {
 }
 
 /* ========================================================== */
+/* KEYWORD GRADIENT — site-wide "palabras clave" (todo excepto */
+/* el Hero, que mantiene su propio gradiente). Frío en oscuro   */
+/* (verde/celeste/blanco), cálido en claro (naranja/rosa/gris). */
+/* Sin animación: gradiente estático + un difuminado leve.      */
+/* ========================================================== */
+
+.keyword-gradient {
+  background: var(--keyword-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 14px rgba(var(--accent-primary-rgb), 0.28));
+}
+
+/* ========================================================== */
 /* HERO WORD GRADIENT — "inteligentes" special treatment       */
 /* ========================================================== */
 
@@ -236,7 +269,6 @@ body {
 /* RAINBOW ACCENT — light mode iridescent details              */
 /* ========================================================== */
 
-/* Any element with .rainbow-accent gets iridescent in light mode */
 .light .rainbow-accent {
   animation: hue-spin 5s linear infinite;
 }
@@ -246,7 +278,6 @@ body {
   to   { filter: hue-rotate(360deg) saturate(1.4); }
 }
 
-/* SVG lines, node circles, ecosystem graph accents in light mode */
 .light .accent-line,
 .light .accent-dot,
 .light .accent-border {
@@ -270,7 +301,6 @@ body {
 /* ========================================================== */
 
 .navbar-wordmark-rainbow {
-  /* Dark mode: plain ink color (handled by text-ink class) */
   color: var(--ink);
 }
 
