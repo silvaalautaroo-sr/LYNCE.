@@ -35,9 +35,8 @@ const config: Config = {
         glass: "var(--glass-bg)",
       },
       fontFamily: {
-        display: ["var(--font-space-grotesk)", "sans-serif"],
-        sans: ["var(--font-space-grotesk)", "sans-serif"],
-        hero: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-inter)", "sans-serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
       backgroundImage: {
         "grid-pattern":
