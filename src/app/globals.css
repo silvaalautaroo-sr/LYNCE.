@@ -1,18 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  /* ---- Lynce dark theme (default) — flat, matches the Hero's own dark backdrop ---- */
-  --bg-primary: #02060e;
-  --bg-secondary: #060b18;
-  --accent-primary: #18c29c;   /* green */
-  --accent-secondary: #53e4e1; /* celeste/cyan */
-  --accent-tertiary: #ffffff;  /* white */
-
-  --accent-primary-rgb: 24, 194, 156;
-  --accent-secondary-rgb: 83, 228, 225;
-  --accent-tertiary-rgb: 255, 255, 255;
-
-  /* "Palabras clave" gradient — cool: verde → celeste → blanco */
-  --keyword-gradient: linear-gradient(100deg, #18c29c 0%, #53e4e1 55%, #ffffff 100%);
-  --bg-glow-color: rgba(24, 194, 156, 0.14);
+  /* ---- Lynce dark theme (default) ---- */
+  --bg-primary: #050505;
+  --bg-secondary: #090909;
+  --accent-primary: #18c29c;
+  --accent-secondary: #53e4e1;
 
   --ink: #ffffff;
   --ink-muted: rgba(255, 255, 255, 0.68);
@@ -23,39 +18,331 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.06);
   --grid-line: rgba(255, 255, 255, 0.05);
 
-  --header-bg: rgba(2, 6, 14, 0.55);
+  --header-bg: rgba(5, 5, 5, 0.55);
   --shadow-glow: 0 0 40px rgba(24, 194, 156, 0.18);
 
   color-scheme: dark;
 }
 
 .light {
-  /* ---- Lynce light theme — flat, matches the Hero's own light backdrop ---- */
-  --bg-primary: #e3edfa;
-  --bg-secondary: #d3e1f5;
-  --accent-primary: #e8834f;   /* orange */
-  --accent-secondary: #f2739c; /* rosa */
-  --accent-tertiary: #a8a29e;  /* gris cálido */
+  /* ---- Lynce light theme ---- */
+  --bg-primary: #f7f5f2;
+  --bg-secondary: #efece6;
+  --accent-primary: #0e9d80;
+  --accent-secondary: #1bb9bb;
 
-  --accent-primary-rgb: 232, 131, 79;
-  --accent-secondary-rgb: 242, 115, 156;
-  --accent-tertiary-rgb: 168, 162, 158;
+  --ink: #0a0a0a;
+  --ink-muted: rgba(10, 10, 10, 0.66);
+  --ink-faint: rgba(10, 10, 10, 0.42);
 
-  /* "Palabras clave" gradient — cálido: naranja → rosa → gris */
-  --keyword-gradient: linear-gradient(100deg, #e8834f 0%, #f2739c 55%, #a8a29e 100%);
-  --bg-glow-color: rgba(232, 131, 79, 0.12);
-
-  --ink: #000000;
-  --ink-muted: rgba(0, 0, 0, 0.66);
-  --ink-faint: rgba(0, 0, 0, 0.42);
-
-  --border-soft: rgba(0, 0, 0, 0.1);
+  --border-soft: rgba(10, 10, 10, 0.1);
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-bg-strong: rgba(255, 255, 255, 0.72);
-  --grid-line: rgba(0, 0, 0, 0.06);
+  --grid-line: rgba(10, 10, 10, 0.06);
 
-  --header-bg: rgba(227, 237, 250, 0.6);
-  --shadow-glow: 0 0 40px rgba(232, 131, 79, 0.16);
+  --header-bg: rgba(247, 245, 242, 0.6);
+  --shadow-glow: 0 0 40px rgba(14, 157, 128, 0.14);
 
   color-scheme: light;
+}
+
+* {
+  border-color: var(--border-soft);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--ink);
+  transition: background-color 0.5s var(--ease-premium, cubic-bezier(0.16, 1, 0.3, 1)),
+    color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--accent-primary);
+  color: #05100d;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------- */
+/* Layout backgrounds                  */
+/* ---------------------------------- */
+
+.bg-grid-static {
+  background-image: var(--grid-image, none);
+}
+
+.bg-app-grid {
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.bg-noise {
+  position: relative;
+}
+
+.bg-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ---------------------------------- */
+/* Glassmorphism                       */
+/* ---------------------------------- */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--border-soft);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--border-soft);
+}
+
+/* Animated traveling-light border, used for header + CTA button */
+.animated-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    var(--accent-secondary) 8%,
+    var(--accent-primary) 16%,
+    transparent 28%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-rotate 5s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.font-feature-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================================== */
+/* HERO WORD GRADIENT — "inteligentes" special treatment       */
+/* ========================================================== */
+
+.hero-word-gradient {
+  background: linear-gradient(
+    100deg,
+    #18c29c 0%,
+    #2bff9c 16%,
+    #53e4e1 34%,
+    #ffffff 50%,
+    #6ea8ff 66%,
+    #a78bfa 84%,
+    #18c29c 100%
+  );
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hero-gradient-drift 8s ease-in-out infinite alternate;
+}
+
+.light .hero-word-gradient {
+  background: linear-gradient(
+    100deg,
+    #f4a6c1, #f7c98e, #f4e08a, #a8e0b8,
+    #9fd6e8, #b3aaf0, #f4a6c1
+  );
+  background-size: 380% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hero-gradient-rainbow 8s ease-in-out infinite alternate;
+}
+
+@keyframes hero-gradient-drift {
+  0%   { background-position: 0% 50%;   }
+  100% { background-position: 220% 50%; }
+}
+
+@keyframes hero-gradient-rainbow {
+  0%   { background-position: 0% 50%;   }
+  100% { background-position: 400% 50%; }
+}
+
+/* Light mode hero text colors */
+.light .light-hero-text    { color: #0f172a; }
+.light .light-hero-subtext { color: rgba(15, 23, 42, 0.65); }
+
+/* Light mode — hero fog line color */
+.hero-line-dark  { --tw-gradient-from: rgba(255,255,255,0.3); }
+.light .bg-gradient-to-r.from-hero-line {
+  --tw-gradient-from: rgba(15, 23, 42, 0.2);
+}
+
+/* ========================================================== */
+/* RAINBOW ACCENT — light mode iridescent details              */
+/* ========================================================== */
+
+/* Any element with .rainbow-accent gets iridescent in light mode */
+.light .rainbow-accent {
+  animation: hue-spin 5s linear infinite;
+}
+
+@keyframes hue-spin {
+  from { filter: hue-rotate(0deg) saturate(1.4); }
+  to   { filter: hue-rotate(360deg) saturate(1.4); }
+}
+
+/* SVG lines, node circles, ecosystem graph accents in light mode */
+.light .accent-line,
+.light .accent-dot,
+.light .accent-border {
+  animation: hue-spin 6s linear infinite;
+}
+
+/* ========================================================== */
+/* from-hero-line Tailwind-like helper                         */
+/* ========================================================== */
+.from-hero-line {
+  --tw-gradient-from: rgba(255,255,255,0.25);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255,255,255,0));
+}
+.light .from-hero-line {
+  --tw-gradient-from: rgba(99,102,241,0.4);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(99,102,241,0));
+}
+
+/* ========================================================== */
+/* NAVBAR WORDMARK — rainbow in light mode                     */
+/* ========================================================== */
+
+.navbar-wordmark-rainbow {
+  /* Dark mode: plain ink color (handled by text-ink class) */
+  color: var(--ink);
+}
+
+.light .navbar-wordmark-rainbow {
+  background: linear-gradient(
+    108deg,
+    #e879f9 0%,
+    #818cf8 22%,
+    #38bdf8 45%,
+    #34d399 65%,
+    #fbbf24 82%,
+    #f87171 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: navbar-rainbow-sweep 4s linear infinite;
+}
+
+@keyframes navbar-rainbow-sweep {
+  0%   { background-position: 0%   50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ========================================================== */
+/* NAVBAR WORDMARK — vector asset, masked fill (dark + light)  */
+/* ========================================================== */
+
+.navbar-wordmark-fill {
+  background: var(--ink);
+}
+
+.light .navbar-wordmark-fill {
+  background: linear-gradient(
+    108deg,
+    #e879f9 0%,
+    #818cf8 22%,
+    #38bdf8 45%,
+    #34d399 65%,
+    #fbbf24 82%,
+    #f87171 100%
+  );
+  background-size: 300% 100%;
+  animation: navbar-rainbow-sweep 4s linear infinite;
+}
+
+/* ========================================================== */
+/* HERO BOTTOM GLOW — large blurred semicircle blending into   */
+/* the next section                                            */
+/* ========================================================== */
+
+.hero-bottom-glow {
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(24, 194, 156, 0.32) 0%,
+    rgba(83, 228, 225, 0.18) 32%,
+    rgba(99, 102, 241, 0.1) 55%,
+    rgba(5, 5, 5, 0) 78%
+  );
+  filter: blur(48px);
+  opacity: 0.9;
+}
+
+.light .hero-bottom-glow {
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(244, 166, 193, 0.35) 0%,
+    rgba(159, 214, 232, 0.28) 30%,
+    rgba(179, 170, 240, 0.18) 55%,
+    rgba(247, 245, 242, 0) 78%
+  );
+  filter: blur(48px);
+  opacity: 0.85;
 }
