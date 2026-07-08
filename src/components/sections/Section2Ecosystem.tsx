@@ -105,7 +105,7 @@ export function Section2Ecosystem() {
 
   return (
     <section
-      id="ecosystem"
+      id="platform"
       className="relative overflow-hidden py-32 lg:py-40"
     >
       <div className="container mx-auto max-w-6xl px-6">
