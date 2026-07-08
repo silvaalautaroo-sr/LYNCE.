@@ -32,7 +32,7 @@ export function GlassCard({
       className={cn(
         "glass group relative rounded-2xl p-5 transition-all duration-500 ease-premium",
         active
-          ? "border-accent-primary/50 shadow-[0_0_36px_rgba(24,194,156,0.22)]"
+          ? "border-accent-primary/50 shadow-[0_0_36px_rgba(var(--accent-primary-rgb),0.22)]"
           : "hover:border-ink/20",
         className
       )}
