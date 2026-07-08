@@ -15,12 +15,12 @@ const TECH: Array<{
   glowColor: string;
   bgActive: string;
 }> = [
-  { key: "ai",         icon: Cpu,       activeClass: "text-accent-primary", glowColor: "rgba(24,194,156,0.25)",  bgActive: "rgba(24,194,156,0.1)" },
-  { key: "iot",        icon: Radio,     activeClass: "text-accent-secondary", glowColor: "rgba(83,228,225,0.22)", bgActive: "rgba(83,228,225,0.1)" },
-  { key: "blockchain", icon: Link2,     activeClass: "text-accent-primary", glowColor: "rgba(24,194,156,0.25)",  bgActive: "rgba(24,194,156,0.1)" },
-  { key: "satellites", icon: Satellite, activeClass: "text-accent-secondary", glowColor: "rgba(83,228,225,0.22)", bgActive: "rgba(83,228,225,0.1)" },
-  { key: "cloud",      icon: Cloud,     activeClass: "text-accent-primary", glowColor: "rgba(24,194,156,0.25)",  bgActive: "rgba(24,194,156,0.1)" },
-  { key: "edge",       icon: Server,    activeClass: "text-accent-secondary", glowColor: "rgba(83,228,225,0.22)", bgActive: "rgba(83,228,225,0.1)" },
+{ key: "ai",         icon: Cpu,       activeClass: "text-accent-primary", glowColor: "rgba(var(--accent-primary-rgb),0.25)",  bgActive: "rgba(var(--accent-primary-rgb),0.1)" },
+{ key: "iot",        icon: Radio,     activeClass: "text-accent-secondary", glowColor: "rgba(var(--accent-secondary-rgb),0.22)", bgActive: "rgba(var(--accent-secondary-rgb),0.1)" },
+{ key: "blockchain", icon: Link2,     activeClass: "text-accent-primary", glowColor: "rgba(var(--accent-primary-rgb),0.25)",  bgActive: "rgba(var(--accent-primary-rgb),0.1)" },
+{ key: "satellites", icon: Satellite, activeClass: "text-accent-secondary", glowColor: "rgba(var(--accent-secondary-rgb),0.22)", bgActive: "rgba(var(--accent-secondary-rgb),0.1)" },
+{ key: "cloud",      icon: Cloud,     activeClass: "text-accent-primary", glowColor: "rgba(var(--accent-primary-rgb),0.25)",  bgActive: "rgba(var(--accent-primary-rgb),0.1)" },
+{ key: "edge",       icon: Server,    activeClass: "text-accent-secondary", glowColor: "rgba(var(--accent-secondary-rgb),0.22)", bgActive: "rgba(var(--accent-secondary-rgb),0.1)" },
 ];
 
 export function Section5Technology() {
