@@ -32,9 +32,10 @@ export function SectionHeading({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-accent-primary"
+        className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em]"
         >
           <span className="h-px w-6 bg-accent-primary/60" />
+          <span className="keyword-gradient">{eyebrow}</span>
           {eyebrow}
         </motion.p>
       )}
