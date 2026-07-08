@@ -43,7 +43,7 @@ const config: Config = {
         "grid-pattern":
           "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
         "radial-fade":
-          "radial-gradient(circle at center, rgba(24,194,156,0.12) 0%, transparent 70%)",
+          "radial-gradient(circle at center, var(--bg-glow-color) 0%, transparent 70%)",
       },
       backgroundSize: {
         grid: "56px 56px",
