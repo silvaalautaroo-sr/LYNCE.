@@ -121,15 +121,7 @@ export function HeroCity() {
 
         ctx.clearRect(0, 0, W, H);
 
-        if (isDark) {
-          const bg = ctx.createLinearGradient(0, 0, W, H);
-          bg.addColorStop(0, "#030814"); bg.addColorStop(0.5, "#02060f"); bg.addColorStop(1, "#010408");
-          ctx.fillStyle = bg;
-        } else {
-          const bg = ctx.createLinearGradient(0, 0, W, H);
-          bg.addColorStop(0, "#eaf1fb"); bg.addColorStop(1, "#dce8f8");
-          ctx.fillStyle = bg;
-        }
+        ctx.fillStyle = isDark ? "#000000" : "#ffffff";
         ctx.fillRect(0, 0, W, H);
 
         if (isDark) {
@@ -315,13 +307,13 @@ export function HeroCity() {
         }
 
         const bfg = ctx.createLinearGradient(0, H * 0.68, 0, H);
-        bfg.addColorStop(0, isDark ? "rgba(3,8,20,0)"    : "rgba(234,241,251,0)");
-        bfg.addColorStop(1, isDark ? "rgba(3,8,20,0.97)" : "rgba(220,232,248,0.97)");
+        bfg.addColorStop(0, isDark ? "rgba(0,0,0,0)"    : "rgba(255,255,255,0)");
+        bfg.addColorStop(1, isDark ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,0.97)");
         ctx.fillStyle = bfg; ctx.fillRect(0, H * 0.68, W, H * 0.32);
 
         const lfg = ctx.createLinearGradient(0, 0, W * 0.4, 0);
-        lfg.addColorStop(0, isDark ? "rgba(3,8,20,0.88)"    : "rgba(234,241,251,0.9)");
-        lfg.addColorStop(1, isDark ? "rgba(3,8,20,0)"       : "rgba(234,241,251,0)");
+        lfg.addColorStop(0, isDark ? "rgba(0,0,0,0.88)"    : "rgba(255,255,255,0.9)");
+        lfg.addColorStop(1, isDark ? "rgba(0,0,0,0)"       : "rgba(255,255,255,0)");
         ctx.fillStyle = lfg; ctx.fillRect(0, 0, W * 0.4, H);
       }
 
