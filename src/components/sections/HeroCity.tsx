@@ -124,50 +124,6 @@ export function HeroCity() {
         ctx.fillStyle = isDark ? "#000000" : "#ffffff";
         ctx.fillRect(0, 0, W, H);
 
-        if (isDark) {
-          const topGlow = ctx.createLinearGradient(0, 0, 0, H * 0.38);
-          topGlow.addColorStop(0, "rgba(15,10,60,0.92)");
-          topGlow.addColorStop(0.3, "rgba(10,12,45,0.65)");
-          topGlow.addColorStop(0.7, "rgba(5,8,30,0.28)");
-          topGlow.addColorStop(1, "rgba(2,6,20,0)");
-          ctx.fillStyle = topGlow;
-          ctx.fillRect(0, 0, W, H * 0.38);
-
-          const topShimmer = ctx.createLinearGradient(0, 0, W, 0);
-          topShimmer.addColorStop(0,   "rgba(99,102,241,0.18)");
-          topShimmer.addColorStop(0.4, "rgba(59,130,246,0.10)");
-          topShimmer.addColorStop(0.7, "rgba(6,182,212,0.07)");
-          topShimmer.addColorStop(1,   "rgba(168,85,247,0.15)");
-          ctx.fillStyle = topShimmer;
-          ctx.fillRect(0, 0, W, 3);
-
-          const atm = ctx.createRadialGradient(W * 0.22, H * 0.5, 0, W * 0.22, H * 0.5, W * 0.44);
-          atm.addColorStop(0, "rgba(99,102,241,0.055)");
-          atm.addColorStop(0.5, "rgba(59,130,246,0.025)");
-          atm.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = atm;
-          ctx.fillRect(0, 0, W, H);
-        } else {
-          const topGlow = ctx.createLinearGradient(0, 0, 0, H * 0.4);
-          topGlow.addColorStop(0,   "rgba(220,230,255,0.96)");
-          topGlow.addColorStop(0.25,"rgba(210,225,255,0.75)");
-          topGlow.addColorStop(0.6, "rgba(220,235,255,0.32)");
-          topGlow.addColorStop(1,   "rgba(220,232,248,0)");
-          ctx.fillStyle = topGlow;
-          ctx.fillRect(0, 0, W, H * 0.4);
-
-          const rainbowBand = ctx.createLinearGradient(0, 0, W, 0);
-          rainbowBand.addColorStop(0,    "rgba(232,121,249,0.35)");
-          rainbowBand.addColorStop(0.18, "rgba(129,140,248,0.3)");
-          rainbowBand.addColorStop(0.36, "rgba(56,189,248,0.28)");
-          rainbowBand.addColorStop(0.54, "rgba(52,211,153,0.25)");
-          rainbowBand.addColorStop(0.72, "rgba(251,191,36,0.28)");
-          rainbowBand.addColorStop(0.88, "rgba(249,115,22,0.3)");
-          rainbowBand.addColorStop(1,    "rgba(239,68,68,0.32)");
-          ctx.fillStyle = rainbowBand;
-          ctx.fillRect(0, 0, W, 4);
-        }
-
         ctx.strokeStyle = isDark ? "rgba(30,60,120,0.09)" : "rgba(100,150,220,0.12)";
         ctx.lineWidth   = 0.5;
         for (let c = 0; c < GRID; c++) {
@@ -306,15 +262,6 @@ export function HeroCity() {
           ctx.fillStyle = `rgba(${pac[0]},${pac[1]},${pac[2]},${op})`; ctx.fill();
         }
 
-        const bfg = ctx.createLinearGradient(0, H * 0.68, 0, H);
-        bfg.addColorStop(0, isDark ? "rgba(0,0,0,0)"    : "rgba(255,255,255,0)");
-        bfg.addColorStop(1, isDark ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,0.97)");
-        ctx.fillStyle = bfg; ctx.fillRect(0, H * 0.68, W, H * 0.32);
-
-        const lfg = ctx.createLinearGradient(0, 0, W * 0.4, 0);
-        lfg.addColorStop(0, isDark ? "rgba(0,0,0,0.88)"    : "rgba(255,255,255,0.9)");
-        lfg.addColorStop(1, isDark ? "rgba(0,0,0,0)"       : "rgba(255,255,255,0)");
-        ctx.fillStyle = lfg; ctx.fillRect(0, 0, W * 0.4, H);
       }
 
       rafRef.current = requestAnimationFrame(draw);
