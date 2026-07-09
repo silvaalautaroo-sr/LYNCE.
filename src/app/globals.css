@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 :root {
-  /* ---- Lynce dark theme (default) — flat, matches the Hero's own dark backdrop ---- */
-  --bg-primary: #02060e;
-  --bg-secondary: #060b18;
+  /* ---- Lynce dark theme (default) — bg-primary matches the EXACT final
+     color of HeroCity.tsx's base gradient (line ~126: addColorStop(1, "#010408"))
+     so there's no visible seam where the Hero ends and the rest of the page begins ---- */
+  --bg-primary: #010408;
+  --bg-secondary: #05090f;
   --accent-primary: #18c29c;   /* verde */
   --accent-secondary: #53e4e1; /* celeste */
   --accent-tertiary: #ffffff;  /* blanco */
@@ -27,16 +29,17 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.06);
   --grid-line: rgba(255, 255, 255, 0.05);
 
-  --header-bg: rgba(2, 6, 14, 0.55);
+  --header-bg: rgba(1, 4, 8, 0.55);
   --shadow-glow: 0 0 40px rgba(24, 194, 156, 0.18);
 
   color-scheme: dark;
 }
 
 .light {
-  /* ---- Lynce light theme — flat, matches the Hero's own light backdrop ---- */
-  --bg-primary: #e3edfa;
-  --bg-secondary: #d3e1f5;
+  /* ---- Lynce light theme — bg-primary matches the EXACT final color of
+     HeroCity.tsx's base gradient (line ~130: addColorStop(1, "#dce8f8")) ---- */
+  --bg-primary: #dce8f8;
+  --bg-secondary: #cddef2;
   --accent-primary: #e8834f;   /* naranja */
   --accent-secondary: #f2739c; /* rosa */
   --accent-tertiary: #a8a29e;  /* gris cálido */
@@ -58,7 +61,7 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.72);
   --grid-line: rgba(0, 0, 0, 0.06);
 
-  --header-bg: rgba(227, 237, 250, 0.6);
+  --header-bg: rgba(220, 232, 248, 0.6);
   --shadow-glow: 0 0 40px rgba(232, 131, 79, 0.16);
 
   color-scheme: light;
