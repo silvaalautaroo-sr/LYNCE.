@@ -112,5 +112,158 @@
     "contactTitle": "Contacto",
     "email": "hola@lynce.tech",
     "rights": "Todos los derechos reservados."
+  },
+  "intro": {
+    "pre": "Lynce es una startup argentina que desarrolla la infraestructura digital que conecta, organiza y potencia las tecnologías de una ",
+    "highlight": "ciudad inteligente",
+    "post": "."
+  },
+  "problemVision": {
+    "eyebrow": "Problema + Visión",
+    "title": "Las ciudades ya tienen tecnología. Lo que les falta es conexión.",
+    "paragraphs": [
+      "Hoy existen soluciones para movilidad, seguridad, energía, medio ambiente, infraestructura e inteligencia artificial.",
+      "El problema es que casi todas funcionan de manera independiente.",
+      "En una verdadera Smart City, cada dato debería enriquecer al resto.",
+      "Nuestra visión es construir esa capa de inteligencia capaz de conectar todas las soluciones existentes dentro de una única plataforma."
+    ],
+    "closingA": "Lynce no reemplaza soluciones.",
+    "closingB": "Las integra.",
+    "nodes": [
+      "Tráfico",
+      "Gemelos Digitales",
+      "IA",
+      "Medio Ambiente",
+      "Energía",
+      "Seguridad Pública",
+      "Planificación Urbana",
+      "IoT",
+      "Gobierno",
+      "Movilidad",
+      "Construcción",
+      "Sostenibilidad"
+    ]
+  },
+  "whereWeStart": {
+    "eyebrow": "Dónde empezamos",
+    "title": "Empezamos donde las decisiones urbanas cuestan millones.",
+    "paragraphs": [
+      "El primer producto de Lynce está enfocado en la simulación inteligente de proyectos urbanos mediante Gemelos Digitales.",
+      "Antes de construir, es posible simular distintos escenarios y comprender cómo cada decisión impactará sobre la ciudad.",
+      "Desde un nuevo centro comercial hasta una obra vial o un desarrollo inmobiliario, la plataforma permite visualizar sus efectos antes de ejecutar la inversión."
+    ],
+    "metricPrefix": "Hasta",
+    "metrics": [
+      {
+        "value": 60,
+        "suffix": "%",
+        "label": "menos pérdidas económicas por congestión vehicular"
+      },
+      {
+        "value": 25,
+        "suffix": "%",
+        "label": "menos costos de ampliación de infraestructura"
+      },
+      {
+        "value": 35,
+        "suffix": "%",
+        "label": "más horas de iluminación natural"
+      },
+      {
+        "value": 40,
+        "suffix": "%",
+        "label": "mayor retorno sobre inversiones urbanas"
+      }
+    ],
+    "cardsEyebrow": "Casos de aplicación",
+    "cards": [
+      {
+        "front": "Desarrollos Urbanos",
+        "items": [
+          "Barrios",
+          "Edificios",
+          "Centros Comerciales"
+        ]
+      },
+      {
+        "front": "Infraestructura Vial",
+        "items": [
+          "Rutas",
+          "Intersecciones",
+          "Rotondas",
+          "Autopistas"
+        ]
+      },
+      {
+        "front": "Obras Públicas",
+        "items": [
+          "Hospitales",
+          "Escuelas",
+          "Parques",
+          "Espacios Públicos"
+        ]
+      },
+      {
+        "front": "Construcción Privada",
+        "items": [
+          "Residencial",
+          "Comercial",
+          "Industrial",
+          "Corporativo"
+        ]
+      }
+    ]
+  },
+  "cityBuild": {
+    "eyebrow": "Gemelo Digital",
+    "title": "La ciudad cobra vida.",
+    "subtitle": "De un terreno vacío a un gemelo digital vivo: cada capa que agrega Lynce hace que la ciudad empiece a pensar.",
+    "twin": {
+      "liveLabel": "Datos en tiempo real",
+      "traffic": "Tráfico",
+      "emissions": "Emisiones",
+      "lighting": "Iluminación",
+      "pedestrians": "Peatones"
+    }
+  },
+  "urbanIntelligence": {
+    "eyebrow": "Inteligencia Urbana",
+    "title": "Construido sobre inteligencia urbana.",
+    "paragraphs": [
+      "Lynce combina Gemelos Digitales, Inteligencia Artificial y análisis avanzado de datos para crear simulaciones capaces de representar el comportamiento de una ciudad antes de que los cambios ocurran.",
+      "Nuestra plataforma integra información proveniente de múltiples fuentes para generar modelos más precisos y facilitar mejores decisiones."
+    ],
+    "tiles": {
+      "ai": "IA",
+      "digitalTwins": "Gemelos Digitales",
+      "gis": "GIS",
+      "predictive": "Modelos Predictivos",
+      "traffic": "Tráfico",
+      "cloud": "Cloud",
+      "environment": "Datos Ambientales"
+    }
+  },
+  "ctaSection": {
+    "eyebrow": "Contacto",
+    "title": "Planifiquemos la próxima ciudad, juntos.",
+    "body": "Si formas parte de un gobierno, una empresa, una desarrolladora o una organización que busca planificar ciudades con mejores datos, nos gustaría conocerte. Agenda una reunión con nuestro equipo o contáctanos para explorar posibles colaboraciones.",
+    "tabSchedule": "Agendar una reunión",
+    "tabContact": "Contáctanos",
+    "scheduleHint": "Elegí un día y horario que te quede cómodo.",
+    "form": {
+      "name": "Nombre",
+      "email": "Email",
+      "company": "Empresa",
+      "message": "Mensaje",
+      "namePlaceholder": "Tu nombre",
+      "emailPlaceholder": "nombre@empresa.com",
+      "companyPlaceholder": "Nombre de tu organización",
+      "messagePlaceholder": "Contanos brevemente en qué estás trabajando…",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando…",
+      "success": "¡Gracias! Te responderemos a la brevedad.",
+      "errorRequired": "Este campo es obligatorio.",
+      "errorEmail": "Ingresá un email válido."
+    }
   }
 }
