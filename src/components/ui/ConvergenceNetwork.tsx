@@ -124,7 +124,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         const nx = -ty / len;
         const ny = tx / len;
         const w =
-          baseW * Math.pow(1 - u, 0.62) * (0.4 + 0.6 * reach) + baseW * 0.08;
+          baseW * (Math.pow(1 - u, 0.7) * 0.9 + 0.14) * (0.45 + 0.55 * reach);
         left.push(`${(bx + nx * w).toFixed(1)},${(by + ny * w).toFixed(1)}`);
         right.push(`${(bx - nx * w).toFixed(1)},${(by - ny * w).toFixed(1)}`);
       }
@@ -147,6 +147,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       const prog = progRef.current;
 
       const nextGrabbed: boolean[] = [];
+      const over = orbitR * 0.07; // reach slightly INTO the icon
       arms.forEach((arm, i) => {
         const reach = smooth(clamp((prog - i) / RISE, 0, 1));
         const wob =
@@ -154,8 +155,10 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         // control point: mid, nudged perpendicular for an organic curl
         const qx = (cx + arm.ox) / 2 - arm.diry * wob;
         const qy = (cy + arm.oy) / 2 + arm.dirx * wob;
+        const tipX = arm.ox + arm.dirx * over;
+        const tipY = arm.oy + arm.diry * over;
         const path = armRefs.current[i];
-        if (path) path.setAttribute("d", buildArm(arm.ox, arm.oy, qx, qy, reach));
+        if (path) path.setAttribute("d", buildArm(tipX, tipY, qx, qy, reach));
         nextGrabbed[i] = reach > 0.6;
       });
 
@@ -194,7 +197,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       ? "/logo/lynx-icon-light.png"
       : "/logo/lynx-icon-dark.png";
 
-  const blurAmount = Math.max(4, orbitR * 0.05);
+  const blurAmount = Math.max(1.5, orbitR * 0.014);
 
   return (
     <div
@@ -207,16 +210,10 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         viewBox={`0 0 ${dims.w} ${dims.h}`}
       >
         <defs>
-          {/* Gooey filter — merges arm bases into the core as one fluid */}
-          <filter id="cn-goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation={blurAmount} result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
-              result="goo"
-            />
-            <feBlend in="SourceGraphic" in2="goo" />
+          {/* Soft edge — a light blur only (NO alpha threshold), so the fine
+              arm tips are preserved all the way to each icon */}
+          <filter id="cn-soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation={blurAmount} />
           </filter>
 
           {/* Energy gradient — theme colours, bright band animated outward */}
@@ -243,8 +240,8 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         {/* Ambient glow under the core */}
         <circle cx={cx} cy={cy} r={orbitR * 0.5} fill="url(#cn-core-glow)" />
 
-        {/* Liquid body: arms + core, one gooey fill with flowing energy */}
-        <g filter="url(#cn-goo)" fill="url(#cn-flow)" opacity={0.94}>
+        {/* Liquid body: arms + core, one soft fill with flowing energy */}
+        <g filter="url(#cn-soft)" fill="url(#cn-flow)" opacity={0.94}>
           {ICONS.map((_, i) => (
             <path
               key={i}
