@@ -15,28 +15,31 @@ const ICONS: LucideIcon[] = [
   Map, Radio, Landmark, Bike, HardHat, Sprout,
 ];
 
-const K = 8; // metaball blobs per arm — more blobs = smoother liquid
+const SAMPLES = 12; // centerline samples per arm (smoothness)
+const GRAB_SPEED = 2.1; // arms grabbed per second (sequential)
+const RISE = 1; // prog span over which a single arm extends
 
 interface ConvergenceNetworkProps {
   /** 12 localized labels, in the same order as ICONS. */
   labels: string[];
 }
 
-// Deterministic pseudo-random so SSR and client agree.
 const rand = (seed: number, salt: number) => {
   const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
   return x - Math.floor(x);
 };
+const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
+const smooth = (t: number) => t * t * (3 - 2 * t); // smoothstep
 
 /**
  * Symbiote layer.
  *
- * The Lynce mark sits at the centre as a living pool of liquid. Instead of
- * rigid lines, viscous "arms" (metaballs fused by an SVG gooey filter) reach
- * out, wobble like water and grab each smart-city concept. When the section
- * leaves the viewport the arms retract into the core; every time it scrolls
- * back into view — up or down — they reach out and grab again. The wobble
- * never stops, so the organism always feels alive.
+ * The Lynce mark is a living pool of liquid. Tapered "arms" reach out and grab
+ * each smart-city concept ONE BY ONE, each arm ending exactly on its icon. Once
+ * grabbed, energy flows outward through the whole organism as an animated
+ * radial gradient (theme-aware colour shift — no particles). When the section
+ * leaves the viewport the arms retract; scrolling back in — up or down —
+ * replays the sequential grab.
  */
 export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
   const { resolvedTheme } = useTheme();
@@ -44,15 +47,17 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const inView = useInView(wrapRef, { amount: 0.25 }); // no `once` → re-fires
   const [dims, setDims] = useState({ w: 460, h: 460 });
-  const [grabbed, setGrabbed] = useState(false);
+  const [grabbed, setGrabbed] = useState<boolean[]>(() => ICONS.map(() => false));
 
-  // Imperative refs — the arms are animated by mutating SVG attributes inside a
-  // single rAF loop, never through React state, so 90+ blobs stay smooth.
-  const blobRefs = useRef<(SVGCircleElement | null)[][]>([]);
+  // Imperative refs — arms are animated by mutating SVG attributes in a single
+  // rAF loop, never React state, so everything stays smooth.
+  const armRefs = useRef<(SVGPathElement | null)[]>([]);
   const coreRef = useRef<SVGCircleElement | null>(null);
-  const reachRef = useRef(0);
+  const bandRefs = useRef<(SVGStopElement | null)[]>([]); // [low, mid, high]
+  const progRef = useRef(0);
+  const lastRef = useRef(0);
   const inViewRef = useRef(false);
-  const grabbedRef = useRef(false);
+  const grabbedRef = useRef<boolean[]>(ICONS.map(() => false));
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -74,66 +79,84 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
   const cy = dims.h / 2;
   const orbitR = Math.min(dims.w, dims.h) * 0.4;
 
-  // Per-arm geometry (orbit target + wobble character).
+  // Per-arm geometry: exact node target + gentle wobble character.
   const arms = useMemo(() => {
     return ICONS.map((_, i) => {
       const a = (-90 + i * 30) * (Math.PI / 180);
       return {
         ox: cx + orbitR * Math.cos(a),
         oy: cy + orbitR * Math.sin(a),
-        nx: Math.cos(a),
-        ny: Math.sin(a),
+        dirx: Math.cos(a),
+        diry: Math.sin(a),
         phase: rand(i, 1) * Math.PI * 2,
-        speed: 0.7 + rand(i, 2) * 0.9,
-        swing: (rand(i, 3) - 0.5) * 2, // curl direction/strength
-        delay: i * 0.05,
+        speed: 0.6 + rand(i, 2) * 0.7,
       };
     });
   }, [cx, cy, orbitR]);
 
-  // The liquid animation loop.
+  // Animation loop.
   useEffect(() => {
     if (!mounted) return;
     let raf = 0;
-    const baseR = orbitR * 0.14;
-    const tipR = orbitR * 0.055;
+    const baseW = orbitR * 0.12;
+    lastRef.current = performance.now();
 
-    const loop = (t: number) => {
-      const time = t / 1000;
-      // Ease reach toward 1 when in view, toward a small idle when not.
-      const target = inViewRef.current ? 1 : 0.14;
-      reachRef.current += (target - reachRef.current) * 0.055;
-      const reach = reachRef.current;
+    // Build a tapered liquid arm from the core to its node.
+    const buildArm = (
+      ax: number,
+      ay: number,
+      qx: number,
+      qy: number,
+      reach: number
+    ) => {
+      if (reach < 0.02) return "";
+      const left: string[] = [];
+      const right: string[] = [];
+      for (let s = 0; s <= SAMPLES; s++) {
+        const u = s / SAMPLES;
+        const t = u * reach;
+        const mt = 1 - t;
+        const bx = mt * mt * cx + 2 * mt * t * qx + t * t * ax;
+        const by = mt * mt * cy + 2 * mt * t * qy + t * t * ay;
+        const tx = 2 * mt * (qx - cx) + 2 * t * (ax - qx);
+        const ty = 2 * mt * (qy - cy) + 2 * t * (ay - qy);
+        const len = Math.hypot(tx, ty) || 1;
+        const nx = -ty / len;
+        const ny = tx / len;
+        const w =
+          baseW * Math.pow(1 - u, 0.62) * (0.4 + 0.6 * reach) + baseW * 0.08;
+        left.push(`${(bx + nx * w).toFixed(1)},${(by + ny * w).toFixed(1)}`);
+        right.push(`${(bx - nx * w).toFixed(1)},${(by - ny * w).toFixed(1)}`);
+      }
+      right.reverse();
+      return `M${left.join("L")}L${right.join("L")}Z`;
+    };
 
+    const loop = (now: number) => {
+      const dt = Math.min((now - lastRef.current) / 1000, 0.05);
+      lastRef.current = now;
+      const time = now / 1000;
+
+      // Sequential timeline: prog rises while in view, retracts when not.
+      const dir = inViewRef.current ? 1 : -1;
+      progRef.current = clamp(
+        progRef.current + dir * dt * GRAB_SPEED,
+        0,
+        ICONS.length + 0.5
+      );
+      const prog = progRef.current;
+
+      const nextGrabbed: boolean[] = [];
       arms.forEach((arm, i) => {
-        // Perpendicular so the arm curls sideways like a tentacle.
-        const px = -arm.ny;
-        const py = arm.nx;
+        const reach = smooth(clamp((prog - i) / RISE, 0, 1));
         const wob =
-          Math.sin(time * arm.speed + arm.phase) * orbitR * 0.22 * arm.swing;
-        const breathe = 0.85 + 0.15 * Math.sin(time * 1.6 + arm.phase);
-
-        // Quadratic control point (curved, wobbling) between core and node.
-        const qx = (cx + arm.ox) / 2 + px * wob;
-        const qy = (cy + arm.oy) / 2 + py * wob;
-
-        const row = blobRefs.current[i];
-        if (!row) return;
-        for (let j = 0; j < K; j++) {
-          const blob = row[j];
-          if (!blob) continue;
-          const tt = (j / (K - 1)) * reach;
-          const mt = 1 - tt;
-          const x = mt * mt * cx + 2 * mt * tt * qx + tt * tt * arm.ox;
-          const y = mt * mt * cy + 2 * mt * tt * qy + tt * tt * arm.oy;
-          const r =
-            (baseR + (tipR - baseR) * (j / (K - 1))) *
-            (0.45 + 0.55 * reach) *
-            breathe;
-          blob.setAttribute("cx", x.toFixed(1));
-          blob.setAttribute("cy", y.toFixed(1));
-          blob.setAttribute("r", Math.max(0, r).toFixed(1));
-        }
+          Math.sin(time * arm.speed + arm.phase) * orbitR * 0.06;
+        // control point: mid, nudged perpendicular for an organic curl
+        const qx = (cx + arm.ox) / 2 - arm.diry * wob;
+        const qy = (cy + arm.oy) / 2 + arm.dirx * wob;
+        const path = armRefs.current[i];
+        if (path) path.setAttribute("d", buildArm(arm.ox, arm.oy, qx, qy, reach));
+        nextGrabbed[i] = reach > 0.6;
       });
 
       // Core pulse.
@@ -142,11 +165,21 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         coreRef.current.setAttribute("r", cr.toFixed(1));
       }
 
-      // Toggle node highlight only when it actually changes (cheap).
-      const nowGrabbed = reach > 0.55;
-      if (nowGrabbed !== grabbedRef.current) {
-        grabbedRef.current = nowGrabbed;
-        setGrabbed(nowGrabbed);
+      // Energy flow: a bright band travels outward through the gradient.
+      const band = 0.08 + 0.9 * ((time * 0.22) % 1);
+      const [lo, mid, hi] = bandRefs.current;
+      if (lo) lo.setAttribute("offset", clamp(band - 0.16).toString());
+      if (mid) mid.setAttribute("offset", clamp(band).toString());
+      if (hi) hi.setAttribute("offset", clamp(band + 0.16).toString());
+
+      // Update node highlights only when they change.
+      let changed = false;
+      for (let i = 0; i < nextGrabbed.length; i++) {
+        if (nextGrabbed[i] !== grabbedRef.current[i]) changed = true;
+      }
+      if (changed) {
+        grabbedRef.current = nextGrabbed;
+        setGrabbed(nextGrabbed);
       }
 
       raf = requestAnimationFrame(loop);
@@ -161,7 +194,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       ? "/logo/lynx-icon-light.png"
       : "/logo/lynx-icon-dark.png";
 
-  const blurAmount = Math.max(5, dims.w / 46);
+  const blurAmount = Math.max(4, orbitR * 0.05);
 
   return (
     <div
@@ -169,55 +202,61 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       className="relative mx-auto aspect-square w-full max-w-[460px]"
       aria-hidden="true"
     >
-      {/* Liquid organism */}
       <svg
         className="absolute inset-0 h-full w-full"
         viewBox={`0 0 ${dims.w} ${dims.h}`}
       >
         <defs>
-          {/* Gooey / metaball filter — fuses the blobs into flowing liquid */}
+          {/* Gooey filter — merges arm bases into the core as one fluid */}
           <filter id="cn-goo">
             <feGaussianBlur in="SourceGraphic" stdDeviation={blurAmount} result="blur" />
             <feColorMatrix
               in="blur"
               mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
               result="goo"
             />
             <feBlend in="SourceGraphic" in2="goo" />
           </filter>
+
+          {/* Energy gradient — theme colours, bright band animated outward */}
+          <radialGradient
+            id="cn-flow"
+            gradientUnits="userSpaceOnUse"
+            cx={cx}
+            cy={cy}
+            r={orbitR}
+          >
+            <stop offset="0" stopColor="var(--accent-primary)" />
+            <stop ref={(el) => { bandRefs.current[0] = el; }} offset="0.1" stopColor="var(--accent-primary)" />
+            <stop ref={(el) => { bandRefs.current[1] = el; }} offset="0.3" stopColor="var(--accent-secondary)" />
+            <stop ref={(el) => { bandRefs.current[2] = el; }} offset="0.5" stopColor="var(--accent-primary)" />
+            <stop offset="1" stopColor="var(--accent-tertiary)" />
+          </radialGradient>
+
           <radialGradient id="cn-core-glow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="var(--accent-secondary)" stopOpacity="0.35" />
             <stop offset="100%" stopColor="var(--accent-secondary)" stopOpacity="0" />
           </radialGradient>
         </defs>
 
-        {/* Soft ambient glow under the core */}
+        {/* Ambient glow under the core */}
         <circle cx={cx} cy={cy} r={orbitR * 0.5} fill="url(#cn-core-glow)" />
 
-        {/* The gooey body: arms + core share one fill so they read as one fluid */}
-        <g filter="url(#cn-goo)" fill="var(--accent-primary)" opacity={0.92}>
+        {/* Liquid body: arms + core, one gooey fill with flowing energy */}
+        <g filter="url(#cn-goo)" fill="url(#cn-flow)" opacity={0.94}>
           {ICONS.map((_, i) => (
-            <g key={i}>
-              {Array.from({ length: K }).map((__, j) => (
-                <circle
-                  key={j}
-                  ref={(el) => {
-                    if (!blobRefs.current[i]) blobRefs.current[i] = [];
-                    blobRefs.current[i][j] = el;
-                  }}
-                  cx={cx}
-                  cy={cy}
-                  r={0}
-                />
-              ))}
-            </g>
+            <path
+              key={i}
+              ref={(el) => { armRefs.current[i] = el; }}
+              d=""
+            />
           ))}
           <circle ref={coreRef} cx={cx} cy={cy} r={orbitR * 0.19} />
         </g>
       </svg>
 
-      {/* Center — Lynce mark, above the liquid */}
+      {/* Center — Lynce mark */}
       <div
         className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
         style={{ width: orbitR * 0.34, height: orbitR * 0.34 }}
@@ -233,35 +272,31 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         )}
       </div>
 
-      {/* Concept nodes — gently breathing, lit up while grabbed */}
+      {/* Concept nodes — sit exactly where each arm ends; light up when grabbed */}
       {mounted &&
         arms.map((arm, i) => {
           const Icon = ICONS[i];
           const left = (arm.ox / dims.w) * 100;
           const top = (arm.oy / dims.h) * 100;
+          const on = grabbed[i];
           return (
             <motion.div
               key={i}
               className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
               style={{ left: `${left}%`, top: `${top}%`, width: 92 }}
-              animate={{ scale: [1, 1.05, 1], y: [0, -3, 0] }}
-              transition={{
-                duration: 3 + rand(i, 4) * 2,
-                delay: arm.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              animate={{ scale: on ? [1, 1.06, 1] : 1 }}
+              transition={{ duration: 2.4, repeat: on ? Infinity : 0, ease: "easeInOut" }}
             >
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-xl border backdrop-blur-md transition-all duration-500"
                 style={{
-                  borderColor: grabbed
-                    ? "rgba(var(--accent-primary-rgb),0.55)"
+                  borderColor: on
+                    ? "rgba(var(--accent-primary-rgb),0.6)"
                     : "var(--border-soft)",
                   background: "var(--glass-bg)",
-                  color: grabbed ? "var(--accent-primary)" : "var(--ink-faint)",
-                  boxShadow: grabbed
-                    ? "0 0 22px rgba(var(--accent-primary-rgb),0.28)"
+                  color: on ? "var(--accent-primary)" : "var(--ink-faint)",
+                  boxShadow: on
+                    ? "0 0 24px rgba(var(--accent-primary-rgb),0.3)"
                     : "none",
                 }}
               >
@@ -269,7 +304,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
               </div>
               <span
                 className="text-center text-[0.62rem] font-medium leading-tight transition-colors duration-500"
-                style={{ color: grabbed ? "var(--ink)" : "var(--ink-faint)" }}
+                style={{ color: on ? "var(--ink)" : "var(--ink-faint)" }}
               >
                 {labels[i]}
               </span>
