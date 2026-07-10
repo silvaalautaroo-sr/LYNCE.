@@ -83,9 +83,6 @@ export function CityBuildCanvas({ theme, onTwinReady }: CityBuildCanvasProps) {
     if (!ctx) return;
 
     const pal = PALETTES[theme];
-    const reduce = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
 
     // ── build the grid once ────────────────────────────────────────────────
     const cells: Cell[] = [];
@@ -190,7 +187,7 @@ export function CityBuildCanvas({ theme, onTwinReady }: CityBuildCanvasProps) {
 
     const draw = (now: number) => {
       const elapsed = now - start;
-      const p = reduce ? 1 : clamp(elapsed / DURATION);
+      const p = clamp(elapsed / DURATION);
       const time = now / 1000;
 
       if (!twinFired.current && p > 0.9) {
