@@ -82,14 +82,14 @@ body {
     color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* NOTE: We intentionally do NOT globally disable animations under
+   `prefers-reduced-motion`, because the ambient motion is core to the Lynce
+   brand experience. We only relax page-level smooth scrolling for users who
+   ask for reduced motion. Individual heavy effects can still opt out on their
+   own if ever needed. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  html {
+    scroll-behavior: auto;
   }
 }
 
