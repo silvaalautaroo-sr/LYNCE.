@@ -147,7 +147,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       const prog = progRef.current;
 
       const nextGrabbed: boolean[] = [];
-      const over = orbitR * 0.07; // reach slightly INTO the icon
+      const over = orbitR * 0.04; // reach just into the (now centred) icon
       arms.forEach((arm, i) => {
         const reach = smooth(clamp((prog - i) / RISE, 0, 1));
         const wob =
@@ -197,8 +197,6 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
       ? "/logo/lynx-icon-light.png"
       : "/logo/lynx-icon-dark.png";
 
-  const blurAmount = Math.max(1.5, orbitR * 0.014);
-
   return (
     <div
       ref={wrapRef}
@@ -210,12 +208,6 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         viewBox={`0 0 ${dims.w} ${dims.h}`}
       >
         <defs>
-          {/* Soft edge — a light blur only (NO alpha threshold), so the fine
-              arm tips are preserved all the way to each icon */}
-          <filter id="cn-soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation={blurAmount} />
-          </filter>
-
           {/* Energy gradient — theme colours, bright band animated outward */}
           <radialGradient
             id="cn-flow"
@@ -240,8 +232,8 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
         {/* Ambient glow under the core */}
         <circle cx={cx} cy={cy} r={orbitR * 0.5} fill="url(#cn-core-glow)" />
 
-        {/* Liquid body: arms + core, one soft fill with flowing energy */}
-        <g filter="url(#cn-soft)" fill="url(#cn-flow)" opacity={0.94}>
+        {/* Liquid body: arms + core, crisp fill with flowing energy */}
+        <g fill="url(#cn-flow)" opacity={0.96}>
           {ICONS.map((_, i) => (
             <path
               key={i}
@@ -279,32 +271,37 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
           return (
             <motion.div
               key={i}
-              className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
-              style={{ left: `${left}%`, top: `${top}%`, width: 92 }}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${left}%`, top: `${top}%` }}
               animate={{ scale: on ? [1, 1.06, 1] : 1 }}
               transition={{ duration: 2.4, repeat: on ? Infinity : 0, ease: "easeInOut" }}
             >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl border backdrop-blur-md transition-all duration-500"
-                style={{
-                  borderColor: on
-                    ? "rgba(var(--accent-primary-rgb),0.6)"
-                    : "var(--border-soft)",
-                  background: "var(--glass-bg)",
-                  color: on ? "var(--accent-primary)" : "var(--ink-faint)",
-                  boxShadow: on
-                    ? "0 0 24px rgba(var(--accent-primary-rgb),0.3)"
-                    : "none",
-                }}
-              >
-                <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+              {/* The icon box is centred EXACTLY on the circle point, so the
+                  arm tip lands on the icon. The label hangs below out of flow
+                  and does not shift the anchor. */}
+              <div className="relative flex h-10 w-10 items-center justify-center">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border backdrop-blur-md transition-all duration-500"
+                  style={{
+                    borderColor: on
+                      ? "rgba(var(--accent-primary-rgb),0.6)"
+                      : "var(--border-soft)",
+                    background: "var(--glass-bg)",
+                    color: on ? "var(--accent-primary)" : "var(--ink-faint)",
+                    boxShadow: on
+                      ? "0 0 24px rgba(var(--accent-primary-rgb),0.3)"
+                      : "none",
+                  }}
+                >
+                  <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+                </div>
+                <span
+                  className="absolute left-1/2 top-full mt-1.5 w-24 -translate-x-1/2 text-center text-[0.62rem] font-medium leading-tight transition-colors duration-500"
+                  style={{ color: on ? "var(--ink)" : "var(--ink-faint)" }}
+                >
+                  {labels[i]}
+                </span>
               </div>
-              <span
-                className="text-center text-[0.62rem] font-medium leading-tight transition-colors duration-500"
-                style={{ color: on ? "var(--ink)" : "var(--ink-faint)" }}
-              >
-                {labels[i]}
-              </span>
             </motion.div>
           );
         })}
