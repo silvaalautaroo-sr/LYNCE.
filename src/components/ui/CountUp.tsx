@@ -33,15 +33,6 @@ export function CountUp({
   useEffect(() => {
     if (!inView) return;
 
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduce) {
-      setDisplay(value);
-      return;
-    }
-
     let raf = 0;
     const start = performance.now();
     // easeOutExpo — fast then settling, feels premium
