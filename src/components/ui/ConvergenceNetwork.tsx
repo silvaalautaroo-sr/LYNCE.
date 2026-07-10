@@ -128,9 +128,23 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
           const f = j / (BLOBS - 1);
           const tt = f * reach;
           const mt = 1 - tt;
-          const x = mt * mt * cx + 2 * mt * tt * qx + tt * tt * arm.ox;
-          const y = mt * mt * cy + 2 * mt * tt * qy + tt * tt * arm.oy;
-          const r = (baseR + (tipR - baseR) * f) * (0.35 + 0.65 * reach);
+          let x = mt * mt * cx + 2 * mt * tt * qx + tt * tt * arm.ox;
+          let y = mt * mt * cy + 2 * mt * tt * qy + tt * tt * arm.oy;
+          // Liquid texture: each blob undulates perpendicular to the arm with
+          // its own frequency/phase, fading to zero at the anchored tip so it
+          // still lands in the icon's centre.
+          const ripple =
+            Math.sin(time * (1.4 + rand(i, 5 + j)) + arm.phase + j * 1.1) *
+            orbitR *
+            0.028 *
+            Math.sin(Math.PI * f) * // zero at base AND at the tip
+            reach;
+          x += -arm.diry * ripple;
+          y += arm.dirx * ripple;
+          // Radius breathes per-blob → lumpy, viscous surface.
+          const swell =
+            1 + 0.16 * Math.sin(time * (2 + rand(i, 9 + j) * 1.5) + j * 0.9);
+          const r = (baseR + (tipR - baseR) * f) * (0.35 + 0.65 * reach) * swell;
           blob.setAttribute("cx", x.toFixed(1));
           blob.setAttribute("cy", y.toFixed(1));
           blob.setAttribute("r", Math.max(0, r).toFixed(1));
@@ -207,7 +221,7 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
             <stop ref={(el) => { bandRefs.current[0] = el; }} offset="0.1" stopColor="var(--accent-primary)" />
             <stop ref={(el) => { bandRefs.current[1] = el; }} offset="0.3" stopColor="var(--accent-secondary)" />
             <stop ref={(el) => { bandRefs.current[2] = el; }} offset="0.5" stopColor="var(--accent-primary)" />
-            <stop offset="1" stopColor="var(--accent-tertiary)" />
+            <stop offset="1" stopColor="var(--accent-primary)" />
           </radialGradient>
 
           <radialGradient id="cn-core-glow" cx="50%" cy="50%" r="50%">
@@ -266,14 +280,22 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
           const top = (arm.oy / dims.h) * 100;
           const on = grabbed[i];
           return (
-            <motion.div
+            <div
               key={i}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${left}%`, top: `${top}%` }}
-              animate={{ scale: on ? [1, 1.06, 1] : 1 }}
-              transition={{ duration: 2.4, repeat: on ? Infinity : 0, ease: "easeInOut" }}
+              className="absolute"
+              style={{
+                left: `${left}%`,
+                top: `${top}%`,
+                transform: "translate(-50%, -50%)",
+              }}
             >
-              <div className="relative flex h-10 w-10 items-center justify-center">
+              {/* Framer animates scale on this INNER element so it never
+                  clobbers the centering transform of the outer wrapper. */}
+              <motion.div
+                animate={{ scale: on ? [1, 1.06, 1] : 1 }}
+                transition={{ duration: 2.4, repeat: on ? Infinity : 0, ease: "easeInOut" }}
+                className="relative flex h-10 w-10 items-center justify-center"
+              >
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-xl border backdrop-blur-md transition-all duration-500"
                   style={{
@@ -295,8 +317,8 @@ export function ConvergenceNetwork({ labels }: ConvergenceNetworkProps) {
                 >
                   {labels[i]}
                 </span>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           );
         })}
     </div>
