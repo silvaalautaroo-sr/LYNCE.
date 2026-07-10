@@ -37,9 +37,18 @@
     "headlineLine2": "They need technologies that work together.",
     "body": "Today, hundreds of companies build smart technology for cities: traffic, waste, lighting, energy, water, mobility, environmental monitoring. Each one solves its own piece. But every platform lives in isolation, speaking a different language, blind to the rest. The result isn't a smart city. It's a collection of smart systems that don't talk to each other.",
     "tags": [
-      "Traffic", "Waste", "Lighting", "Energy",
-      "Water", "Mobility", "IoT", "AI", "GIS",
-      "Satellites", "Blockchain", "Monitoring"
+      "Traffic",
+      "Waste",
+      "Lighting",
+      "Energy",
+      "Water",
+      "Mobility",
+      "IoT",
+      "AI",
+      "GIS",
+      "Satellites",
+      "Blockchain",
+      "Monitoring"
     ]
   },
   "ecosystem": {
@@ -125,5 +134,158 @@
     "contactTitle": "Contact",
     "email": "hola@lynce.tech",
     "rights": "All rights reserved."
+  },
+  "intro": {
+    "pre": "Lynce is an Argentine startup building the digital infrastructure that connects, organizes, and powers the technologies of a ",
+    "highlight": "smart city",
+    "post": "."
+  },
+  "problemVision": {
+    "eyebrow": "Problem + Vision",
+    "title": "Cities already have technology. What they lack is connection.",
+    "paragraphs": [
+      "Today there are solutions for mobility, safety, energy, the environment, infrastructure, and artificial intelligence.",
+      "The problem is that almost all of them work in isolation.",
+      "In a true Smart City, every piece of data should enrich the rest.",
+      "Our vision is to build that layer of intelligence — one capable of connecting every existing solution inside a single platform."
+    ],
+    "closingA": "Lynce doesn't replace solutions.",
+    "closingB": "It integrates them.",
+    "nodes": [
+      "Traffic",
+      "Digital Twins",
+      "AI",
+      "Environment",
+      "Energy",
+      "Public Safety",
+      "Urban Planning",
+      "IoT",
+      "Government",
+      "Mobility",
+      "Construction",
+      "Sustainability"
+    ]
+  },
+  "whereWeStart": {
+    "eyebrow": "Where we start",
+    "title": "We start where urban decisions cost millions.",
+    "paragraphs": [
+      "Lynce's first product focuses on the intelligent simulation of urban projects through Digital Twins.",
+      "Before building, you can simulate different scenarios and understand how each decision will impact the city.",
+      "From a new shopping center to a road project or a real-estate development, the platform lets you visualize the effects before committing the investment."
+    ],
+    "metricPrefix": "Up to",
+    "metrics": [
+      {
+        "value": 60,
+        "suffix": "%",
+        "label": "fewer economic losses from traffic congestion"
+      },
+      {
+        "value": 25,
+        "suffix": "%",
+        "label": "lower infrastructure expansion costs"
+      },
+      {
+        "value": 35,
+        "suffix": "%",
+        "label": "more hours of natural lighting"
+      },
+      {
+        "value": 40,
+        "suffix": "%",
+        "label": "higher return on urban investments"
+      }
+    ],
+    "cardsEyebrow": "Where it applies",
+    "cards": [
+      {
+        "front": "Urban Developments",
+        "items": [
+          "Neighborhoods",
+          "Buildings",
+          "Shopping Centers"
+        ]
+      },
+      {
+        "front": "Road Infrastructure",
+        "items": [
+          "Roads",
+          "Intersections",
+          "Roundabouts",
+          "Highways"
+        ]
+      },
+      {
+        "front": "Public Projects",
+        "items": [
+          "Hospitals",
+          "Schools",
+          "Parks",
+          "Public Spaces"
+        ]
+      },
+      {
+        "front": "Private Construction",
+        "items": [
+          "Residential",
+          "Commercial",
+          "Industrial",
+          "Corporate"
+        ]
+      }
+    ]
+  },
+  "cityBuild": {
+    "eyebrow": "Digital Twin",
+    "title": "The city comes to life.",
+    "subtitle": "From empty land to a living digital twin: every layer Lynce adds makes the city start to think.",
+    "twin": {
+      "liveLabel": "Real-time data",
+      "traffic": "Traffic",
+      "emissions": "Emissions",
+      "lighting": "Lighting",
+      "pedestrians": "Pedestrians"
+    }
+  },
+  "urbanIntelligence": {
+    "eyebrow": "Urban Intelligence",
+    "title": "Built on urban intelligence.",
+    "paragraphs": [
+      "Lynce combines Digital Twins, Artificial Intelligence, and advanced data analysis to create simulations that can represent how a city behaves before changes ever happen.",
+      "Our platform integrates information from multiple sources to generate more accurate models and enable better decisions."
+    ],
+    "tiles": {
+      "ai": "AI",
+      "digitalTwins": "Digital Twins",
+      "gis": "GIS",
+      "predictive": "Predictive Models",
+      "traffic": "Traffic",
+      "cloud": "Cloud",
+      "environment": "Environmental Data"
+    }
+  },
+  "ctaSection": {
+    "eyebrow": "Get in touch",
+    "title": "Let's plan the next city, together.",
+    "body": "If you're part of a government, a company, a developer, or an organization looking to plan cities with better data, we'd like to meet you. Schedule a meeting with our team or reach out to explore ways to work together.",
+    "tabSchedule": "Schedule a Meeting",
+    "tabContact": "Contact Us",
+    "scheduleHint": "Pick a day and time that works for you.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "company": "Company",
+      "message": "Message",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "name@company.com",
+      "companyPlaceholder": "Your organization's name",
+      "messagePlaceholder": "Tell us briefly what you're working on…",
+      "submit": "Send message",
+      "sending": "Sending…",
+      "success": "Thanks! We'll get back to you shortly.",
+      "errorRequired": "This field is required.",
+      "errorEmail": "Enter a valid email."
+    }
   }
 }
