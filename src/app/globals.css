@@ -76,10 +76,19 @@ html {
 }
 
 body {
+  /* Default body typography for the whole site → Inter.
+     (Hero is re-pinned below; the navbar sets Inter inline itself.) */
+  font-family: var(--font-inter), Inter, sans-serif;
   background-color: var(--bg-primary);
   color: var(--ink);
   transition: background-color 0.5s var(--ease-premium, cubic-bezier(0.16, 1, 0.3, 1)),
     color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keep the Hero exactly as it was (Space Grotesk), untouched by the change
+   above. Everything OUTSIDE the Hero + navbar now renders in Inter. */
+#hero {
+  font-family: var(--font-space-grotesk), sans-serif;
 }
 
 /* NOTE: We intentionally do NOT globally disable animations under
@@ -206,6 +215,10 @@ body {
 /* ========================================================== */
 
 .keyword-gradient {
+  /* Keyword typography → Inter Black Italic */
+  font-family: var(--font-inter), Inter, sans-serif;
+  font-weight: 900;
+  font-style: italic;
   background: var(--keyword-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
