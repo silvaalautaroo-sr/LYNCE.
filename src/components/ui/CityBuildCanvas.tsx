@@ -16,7 +16,7 @@ interface CityBuildCanvasProps {
 }
 
 /* ============================================================================
- * MANHATTAN — DIGITAL TWIN
+ * MANHATTAN — DIGITAL TWIN (street-level analysis)
  *
  * Real geometry, built procedurally (no copyright, a few KB):
  *   grid, Central Park (true 1:5 footprint), rivers, Broadway, Midtown spike.
@@ -27,9 +27,11 @@ interface CityBuildCanvasProps {
  *   3. EXTRUDE   — camera tilts, footprints rise into volumes
  *   4. LIFE      — traffic, pedestrians, dusk lights
  *   5. TWIN      — live data pins
- *   6. FOCUS     — deep zoom into the analysed building: real car shapes with
- *      lights, a bus leaving its route trail, walking pedestrians (animated
- *      legs/arms), lane markings, crosswalks, emissions and an energy feed.
+ *   6. FOCUS     — the camera dives to STREET LEVEL on the analysed building:
+ *      full facade with lit windows, the ENTRANCE DOOR with a canopy (people
+ *      walk in), the PARKING GATE with its ramp (cars drive in), street lamps,
+ *      lane markings, crosswalks, a bus leaving its route line, rooftop
+ *      emissions and an energy feed.
  * ========================================================================== */
 
 interface Palette {
@@ -78,6 +80,11 @@ const PALETTES: Record<"dark" | "light", Palette> = {
   },
 };
 
+const ACCENT_RGB: Record<"dark" | "light", string> = {
+  dark: "24,194,156",
+  light: "232,131,79",
+};
+
 const AVE = 3.5;
 const V0 = 34;
 const V1 = 122;
@@ -86,9 +93,10 @@ const PARK = { u0: 5, u1: 8, v0: 59, v1: 110 };
 const ROT = (-72 * Math.PI) / 180;
 const PITCH_END = 0.62;
 const UC = 5.75;
-const ZOOM = 3.6; // deep focus zoom
+const ZOOM = 11; // street-level: you can read the entrance
 const FOCUS_U = 6; // analysed building: block column
 const FOCUS_V = 44; // block row (≈ 44th St — Midtown)
+const STREET_N = FOCUS_V + VSTEP; // the street the entrance fronts (visible face)
 
 const rnd = (a: number, b: number) => {
   const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
@@ -158,6 +166,7 @@ export function CityBuildCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const pal = PALETTES[theme];
+    const aRGB = ACCENT_RGB[theme];
 
     const cosR = Math.cos(ROT);
     const sinR = Math.sin(ROT);
@@ -222,14 +231,20 @@ export function CityBuildCanvas({
       spd: 0.02 + rnd(i, 9) * 0.02,
       dir: rnd(i, 10) > 0.5 ? 1 : -1,
     }));
-    // Walking pedestrians around the analysed building
+    // Sidewalk pedestrians around the analysed building (mostly the visible
+    // north sidewalk) …
     const walkers = Array.from({ length: 8 }, (_, i) => ({
-      side: i % 2, // 0 = south sidewalk, 1 = north
+      side: i % 3 === 0 ? 0 : 1,
       t: rnd(i, 21),
-      spd: 0.035 + rnd(i, 22) * 0.035,
+      spd: 0.03 + rnd(i, 22) * 0.03,
       dir: rnd(i, 23) > 0.5 ? 1 : -1,
       ph: rnd(i, 24) * Math.PI * 2,
     }));
+    // …and two people who walk up to the door and go inside.
+    const enterers = [
+      { off: 0.0, from: -1 },
+      { off: 0.5, from: 1 },
+    ];
 
     const pins = [
       { u: 3.5, v: 52 },
@@ -324,7 +339,6 @@ export function CityBuildCanvas({
       ctx.closePath();
     };
 
-    /** Screen-space unit direction between two world points. */
     const dirOf = (u1: number, v1: number, u2: number, v2: number): Pt => {
       const a = proj(u1, v1, 0.15);
       const b = proj(u2, v2, 0.15);
@@ -334,9 +348,9 @@ export function CityBuildCanvas({
       return { x: dx / l, y: dy / l };
     };
 
-    /** A real little car: body + cabin + headlights, oriented along `dir`. */
+    /** A real little car: body + cabin + headlights + taillights. */
     const drawCar = (pt: Pt, dir: Pt, color: string, alpha: number, k = 1) => {
-      const L = clamp(scale * 0.42, 5, 26) * k;
+      const L = clamp(scale * 0.28, 5, 34) * k;
       const Wd = L * 0.5;
       ctx.save();
       ctx.translate(pt.x, pt.y);
@@ -345,11 +359,9 @@ export function CityBuildCanvas({
       ctx.fillStyle = color;
       rrect(-L / 2, -Wd / 2, L, Wd, Wd * 0.34);
       ctx.fill();
-      // cabin (windshield block)
       ctx.fillStyle = "rgba(0,0,0,0.35)";
       rrect(-L * 0.16, -Wd * 0.3, L * 0.4, Wd * 0.6, Wd * 0.2);
       ctx.fill();
-      // headlights + taillights
       ctx.fillStyle = pal.window;
       ctx.fillRect(L / 2 - L * 0.08, -Wd * 0.34, L * 0.08, Wd * 0.2);
       ctx.fillRect(L / 2 - L * 0.08, Wd * 0.14, L * 0.08, Wd * 0.2);
@@ -360,9 +372,9 @@ export function CityBuildCanvas({
       ctx.globalAlpha = 1;
     };
 
-    /** The bus: longer body, side windows, roof stripe. */
+    /** The bus: long body, side windows, headlights. */
     const drawBus = (pt: Pt, dir: Pt, alpha: number) => {
-      const L = clamp(scale * 0.42, 5, 26) * 2.1;
+      const L = clamp(scale * 0.28, 5, 34) * 2.1;
       const Wd = L * 0.3;
       ctx.save();
       ctx.translate(pt.x, pt.y);
@@ -371,14 +383,12 @@ export function CityBuildCanvas({
       ctx.fillStyle = pal.accent2;
       rrect(-L / 2, -Wd / 2, L, Wd, Wd * 0.28);
       ctx.fill();
-      // windows
       ctx.fillStyle = "rgba(0,0,0,0.4)";
       const n = 4;
       for (let i = 0; i < n; i++) {
         const wx = -L * 0.36 + (i * L * 0.62) / (n - 1);
         ctx.fillRect(wx, -Wd * 0.3, L * 0.11, Wd * 0.6);
       }
-      // headlights
       ctx.fillStyle = pal.window;
       ctx.fillRect(L / 2 - L * 0.05, -Wd * 0.3, L * 0.05, Wd * 0.22);
       ctx.fillRect(L / 2 - L * 0.05, Wd * 0.08, L * 0.05, Wd * 0.22);
@@ -393,7 +403,7 @@ export function CityBuildCanvas({
       color: string,
       alpha: number
     ) => {
-      const k = clamp(scale / 34, 0.5, 1.7);
+      const k = clamp(scale / 34, 0.5, 3.4);
       const bob = Math.sin(phase * 2) * 0.5 * k;
       ctx.save();
       ctx.translate(foot.x, foot.y + bob * 0.4);
@@ -402,17 +412,14 @@ export function CityBuildCanvas({
       ctx.fillStyle = color;
       ctx.lineWidth = 1.1 * k;
       ctx.lineCap = "round";
-      // head
       ctx.beginPath();
       ctx.arc(0, -6.4 * k, 1.35 * k, 0, Math.PI * 2);
       ctx.fill();
-      // torso
       ctx.beginPath();
       ctx.moveTo(0, -5 * k);
       ctx.lineTo(0, -2.4 * k);
       ctx.stroke();
       const sw = Math.sin(phase) * 1.9 * k;
-      // legs
       ctx.beginPath();
       ctx.moveTo(0, -2.4 * k);
       ctx.lineTo(sw, 0);
@@ -421,7 +428,6 @@ export function CityBuildCanvas({
       ctx.moveTo(0, -2.4 * k);
       ctx.lineTo(-sw, 0);
       ctx.stroke();
-      // arms (opposite swing)
       ctx.beginPath();
       ctx.moveTo(0, -4.6 * k);
       ctx.lineTo(-sw * 0.7, -2.9 * k);
@@ -431,6 +437,37 @@ export function CityBuildCanvas({
       ctx.lineTo(sw * 0.7, -2.9 * k);
       ctx.stroke();
       ctx.restore();
+      ctx.globalAlpha = 1;
+    };
+
+    /** A street lamp: pole + arm + glowing bulb. */
+    const drawLamp = (
+      u: number,
+      v: number,
+      armU: number,
+      armV: number,
+      alpha: number,
+      glow: number
+    ) => {
+      const base = proj(u, v, 0);
+      const topP = proj(u, v, 1.5);
+      const tip = proj(u + armU, v + armV, 1.48);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = shadeHex(theme === "dark" ? "#3a4a5e" : "#8a99ab", 1);
+      ctx.lineWidth = clamp(scale * 0.016, 0.8, 2.2);
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(base.x, base.y);
+      ctx.lineTo(topP.x, topP.y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.stroke();
+      ctx.fillStyle = pal.window;
+      ctx.shadowBlur = 14 * glow;
+      ctx.shadowColor = pal.window;
+      ctx.beginPath();
+      ctx.arc(tip.x, tip.y, clamp(scale * 0.02, 1.2, 3.2), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
     };
 
@@ -451,38 +488,40 @@ export function CityBuildCanvas({
     };
 
     const start = performance.now();
-    const DURATION = 13000;
+    const DURATION = 15000;
     let raf = 0;
 
     const draw = (now: number) => {
       const p = clamp((now - start) / DURATION);
       const time = now / 1000;
 
-      if (!twinFired.current && p > 0.84) {
+      if (!twinFired.current && p > 0.8) {
         twinFired.current = true;
         onTwinReady?.();
       }
 
-      const scan = seg(p, 0.13, 0.3);
-      const sat = 1 - seg(p, 0.17, 0.4);
-      pitch = smooth(seg(p, 0.28, 0.52)) * PITCH_END;
-      const rise = smooth(seg(p, 0.3, 0.58));
-      const dusk = seg(p, 0.7, 0.82);
-      const twinR = seg(p, 0.8, 0.88);
-      const focusT = smooth(seg(p, 0.88, 1));
+      const scan = seg(p, 0.12, 0.28);
+      const sat = 1 - seg(p, 0.15, 0.38);
+      pitch = smooth(seg(p, 0.26, 0.5)) * PITCH_END;
+      const rise = smooth(seg(p, 0.28, 0.56));
+      const dusk = seg(p, 0.66, 0.78);
+      const twinR = seg(p, 0.76, 0.85);
+      const focusT = smooth(seg(p, 0.85, 1));
 
-      /* camera: deep zoom + travel + a subtle living drift */
+      /* camera: dive to street level at the entrance corner, subtle drift */
       scale = baseScale * (1 + (ZOOM - 1) * focusT);
-      const fx = (focus.cu - UC) * AVE;
-      const fy = focus.cv - VC;
+      const fAu = focus.cu; // anchor: middle of the entrance facade…
+      const fAv = focus.v1; // …on the visible north face
+      const fx = (fAu - UC) * AVE;
+      const fy = fAv - VC;
       const frx = fx * cosR - fy * sinR;
       const fry = fx * sinR + fy * cosR;
-      const fzMid = focus.h * (1 + 0.35 * focusT) * 5.6 * 0.3;
-      const driftX = Math.sin(time * 0.22) * scale * 0.035 * focusT;
-      const driftY = Math.cos(time * 0.17) * scale * 0.022 * focusT;
+      const fzAim = 1.5; // aim at door height
+      const driftX = Math.sin(time * 0.22) * scale * 0.012 * focusT;
+      const driftY = Math.cos(time * 0.17) * scale * 0.008 * focusT;
       const desOx = W / 2 - frx * scale + driftX;
       const desOy =
-        H * 0.58 - (fry * Math.cos(pitch) - fzMid * Math.sin(pitch)) * scale + driftY;
+        H * 0.56 - (fry * Math.cos(pitch) - fzAim * Math.sin(pitch)) * scale + driftY;
       ox = baseOx + (desOx - baseOx) * focusT;
       oy = baseOy + (desOy - baseOy) * focusT;
 
@@ -522,9 +561,15 @@ export function CityBuildCanvas({
         ctx.globalAlpha = 1;
       }
 
-      /* blocks: imagery → wireframe → volumes */
+      /* blocks: imagery → wireframe → volumes (with off-screen culling) */
       const plateA = img ? 0.3 : 1;
+      const mX = 3 * scale;
+      const mB = 6 * scale;
       for (const b of blocks) {
+        const cpt = proj(b.cu, b.cv, 0);
+        if (cpt.x < -mX || cpt.x > W + mX || cpt.y < -mX || cpt.y > H + mB)
+          continue;
+
         const foot: Pt[] = [
           proj(b.u0, b.v0),
           proj(b.u1, b.v0),
@@ -566,10 +611,10 @@ export function CityBuildCanvas({
           proj(b.u0, b.v1, z),
         ];
 
-        const fL = b.focus ? mixHex(pal.faceL, pal.accent, focusT * 0.55) : pal.faceL;
-        const fR = b.focus ? mixHex(pal.faceR, pal.accent, focusT * 0.75) : pal.faceR;
+        const fL = b.focus ? mixHex(pal.faceL, pal.accent, focusT * 0.4) : pal.faceL;
+        const fR = b.focus ? mixHex(pal.faceR, pal.accent, focusT * 0.55) : pal.faceR;
         const fT = b.focus
-          ? mixHex(pal.top, pal.accent, focusT * 0.9)
+          ? mixHex(pal.top, pal.accent, focusT * 0.8)
           : shadeHex(pal.top, 0.85 + rnd(b.v0, b.u0) * 0.3);
 
         for (let i = 0; i < 4; i++) {
@@ -580,18 +625,144 @@ export function CityBuildCanvas({
         }
         poly(top, fT);
 
-        if (b.focus && focusT > 0.05) {
+        /* ── STREET-LEVEL FACADE of the analysed building ── */
+        if (b.focus && focusT > 0.02) {
+          const A = focusT;
+          // visible faces: N (v = v1, the entrance) and E (u = u0, the parking)
+          const faceN = (s: number, h: number) =>
+            proj(b.u0 + (b.u1 - b.u0) * s, b.v1, h);
+          const faceE = (s: number, h: number) =>
+            proj(b.u0, b.v0 + (b.v1 - b.v0) * s, h);
+          const quad = (
+            f: (s: number, h: number) => Pt,
+            s0: number,
+            s1: number,
+            h0: number,
+            h1: number,
+            fill?: string,
+            stroke?: string,
+            lw = 1
+          ) => poly([f(s0, h0), f(s1, h0), f(s1, h1), f(s0, h1)], fill, stroke, lw);
+
+          // windows on both visible faces (above the ground floor)
+          const rows = Math.max(3, Math.floor((z - 1.5) / 0.6));
+          const faces: [typeof faceN, number][] = [
+            [faceN, 5],
+            [faceE, 4],
+          ];
+          for (const [f, cols] of faces) {
+            for (let r = 0; r < rows; r++) {
+              const h0 = 1.4 + r * ((z - 1.9) / rows);
+              const h1 = h0 + ((z - 1.9) / rows) * 0.45;
+              for (let c = 0; c < cols; c++) {
+                const s0 = 0.09 + (c * 0.82) / cols;
+                const s1 = s0 + (0.82 / cols) * 0.58;
+                const lit = rnd(r * 7 + c, b.u0 * 13 + (f === faceN ? 0 : 5)) > 0.38;
+                if (lit) {
+                  const tw = 0.6 + 0.4 * Math.sin(time * 1.6 + r * 2.1 + c);
+                  ctx.globalAlpha = A * 0.75 * tw;
+                  quad(f, s0, s1, h0, h1, pal.window);
+                } else {
+                  ctx.globalAlpha = A * 0.4;
+                  quad(f, s0, s1, h0, h1, "rgba(0,0,0,0.45)");
+                }
+                ctx.globalAlpha = 1;
+              }
+            }
+          }
+
+          // ── ENTRANCE (north face): recessed double door + canopy + steps
+          ctx.globalAlpha = A;
+          quad(faceN, 0.42, 0.58, 0, 1.0, "rgba(0,0,0,0.55)"); // doorway
+          quad(faceN, 0.42, 0.58, 0, 1.0, undefined, pal.accent2, 1.2); // frame
+          {
+            // door leaf split + glowing handles
+            const mA = faceN(0.5, 0);
+            const mB2 = faceN(0.5, 1.0);
+            ctx.strokeStyle = pal.accent2;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(mA.x, mA.y);
+            ctx.lineTo(mB2.x, mB2.y);
+            ctx.stroke();
+            const h1 = faceN(0.465, 0.45);
+            const h2 = faceN(0.535, 0.45);
+            ctx.fillStyle = pal.window;
+            ctx.beginPath();
+            ctx.arc(h1.x, h1.y, clamp(scale * 0.012, 0.8, 2), 0, Math.PI * 2);
+            ctx.arc(h2.x, h2.y, clamp(scale * 0.012, 0.8, 2), 0, Math.PI * 2);
+            ctx.fill();
+            // warm light spilling from the doorway
+            const g = ctx.createLinearGradient(mB2.x, mB2.y, mA.x, mA.y);
+            g.addColorStop(0, "rgba(0,0,0,0)");
+            g.addColorStop(1, `rgba(${aRGB},0.35)`);
+            quadFill(faceN, 0.42, 0.58, 0, 1.0, g);
+          }
+          // canopy (awning) protruding over the sidewalk
+          poly(
+            [
+              proj(b.cu - 0.11, b.v1, 1.1),
+              proj(b.cu + 0.11, b.v1, 1.1),
+              proj(b.cu + 0.13, b.v1 + 0.14, 1.0),
+              proj(b.cu - 0.13, b.v1 + 0.14, 1.0),
+            ],
+            mixHex(pal.top, pal.accent, 0.85)
+          );
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = pal.accent2;
+          poly(
+            [
+              proj(b.cu - 0.13, b.v1 + 0.14, 1.0),
+              proj(b.cu + 0.13, b.v1 + 0.14, 1.0),
+            ],
+            undefined,
+            pal.accent2,
+            1.4
+          );
+          ctx.shadowBlur = 0;
+
+          // ── PARKING GATE (east face): shuttered opening + ramp
+          const sG0 = (b.cv - 0.17 - b.v0) / (b.v1 - b.v0);
+          const sG1 = (b.cv + 0.17 - b.v0) / (b.v1 - b.v0);
+          quad(faceE, sG0, sG1, 0, 0.75, "rgba(0,0,0,0.6)");
+          quad(faceE, sG0, sG1, 0, 0.75, undefined, pal.accent, 1.2);
+          ctx.strokeStyle = `rgba(${aRGB},0.55)`;
+          ctx.lineWidth = 1;
+          for (let k = 1; k <= 3; k++) {
+            const a1 = faceE(sG0, (0.75 * k) / 4);
+            const b1 = faceE(sG1, (0.75 * k) / 4);
+            ctx.beginPath();
+            ctx.moveTo(a1.x, a1.y);
+            ctx.lineTo(b1.x, b1.y);
+            ctx.stroke();
+          }
+          // "P" ramp markings on the asphalt leading in
+          ctx.globalAlpha = A * 0.5;
+          ctx.strokeStyle = pal.accent;
+          ctx.setLineDash([scale * 0.05, scale * 0.05]);
+          for (const dv of [-0.1, 0.1]) {
+            const a1 = proj(b.u0 - 0.36, b.cv + dv, 0.02);
+            const b1 = proj(b.u0, b.cv + dv, 0.02);
+            ctx.beginPath();
+            ctx.moveTo(a1.x, a1.y);
+            ctx.lineTo(b1.x, b1.y);
+            ctx.stroke();
+          }
+          ctx.setLineDash([]);
+          ctx.globalAlpha = 1;
+
+          // glowing roof outline + pulsing ring
           ctx.globalAlpha = focusT;
           ctx.shadowBlur = 16;
           ctx.shadowColor = pal.accent2;
           poly(top, undefined, pal.accent2, 1.4);
           ctx.shadowBlur = 0;
-          const c = proj(b.cu, b.cv, z);
+          const cc = proj(b.cu, b.cv, z);
           const pulse = 0.5 + 0.5 * Math.sin(time * 2.6);
           ctx.strokeStyle = pal.accent2;
           ctx.lineWidth = 1.2;
           ctx.beginPath();
-          ctx.arc(c.x, c.y, 4 + pulse * 8, 0, Math.PI * 2);
+          ctx.arc(cc.x, cc.y, 4 + pulse * 8, 0, Math.PI * 2);
           ctx.stroke();
           ctx.globalAlpha = 1;
         }
@@ -607,8 +778,8 @@ export function CityBuildCanvas({
       }
 
       /* Broadway */
-      if (scan > 0.15) {
-        ctx.globalAlpha = clamp(scan) * (0.35 + 0.4 * rise) * (1 - focusT * 0.6);
+      if (scan > 0.15 && focusT < 0.7) {
+        ctx.globalAlpha = clamp(scan) * (0.35 + 0.4 * rise) * (1 - focusT);
         ctx.strokeStyle = pal.accent2;
         ctx.lineWidth = 1.6;
         ctx.beginPath();
@@ -622,7 +793,7 @@ export function CityBuildCanvas({
       }
 
       /* scan line */
-      if (p > 0.12 && scan < 1) {
+      if (p > 0.11 && scan < 1) {
         const v = V0 + scan * (V1 - V0);
         const a = proj(-1.8, v);
         const c = proj(13.3, v);
@@ -644,41 +815,41 @@ export function CityBuildCanvas({
       /* ══ street detail near the focus (fades in with the zoom) ══ */
       if (focusT > 0.1) {
         const an = focusT;
-        const mk = `rgba(${theme === "dark" ? "220,232,244" : "70,84,100"},1)`;
+        const mk = theme === "dark" ? "rgba(220,232,244,1)" : "rgba(70,84,100,1)";
 
-        // lane dashes: focus street + focus avenue
+        // lane dashes on the entrance street + the parking avenue
         ctx.strokeStyle = mk;
-        ctx.lineWidth = clamp(scale * 0.02, 0.6, 1.6);
+        ctx.lineWidth = clamp(scale * 0.02, 0.6, 2.4);
         ctx.setLineDash([scale * 0.1, scale * 0.12]);
         ctx.globalAlpha = an * 0.22;
         ctx.beginPath();
-        let s0 = proj(FOCUS_U - 3.2, FOCUS_V);
-        let s1 = proj(FOCUS_U + 4.2, FOCUS_V);
+        let s0 = proj(FOCUS_U - 3.2, STREET_N);
+        let s1 = proj(FOCUS_U + 4.2, STREET_N);
         ctx.moveTo(s0.x, s0.y);
         ctx.lineTo(s1.x, s1.y);
         ctx.stroke();
         ctx.beginPath();
-        s0 = proj(FOCUS_U, FOCUS_V - 5);
-        s1 = proj(FOCUS_U, FOCUS_V + 8);
+        s0 = proj(FOCUS_U, STREET_N - 7);
+        s1 = proj(FOCUS_U, STREET_N + 6);
         ctx.moveTo(s0.x, s0.y);
         ctx.lineTo(s1.x, s1.y);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // crosswalks at the corner (both directions)
+        // crosswalks at the entrance-street corner
         ctx.globalAlpha = an * 0.32;
-        ctx.lineWidth = clamp(scale * 0.035, 1, 2.6);
+        ctx.lineWidth = clamp(scale * 0.045, 1, 5);
         for (let k = -3; k <= 3; k++) {
           const uu = FOCUS_U + k * 0.075;
-          const a1 = proj(uu, FOCUS_V - 0.16);
-          const b1 = proj(uu, FOCUS_V + 0.16);
+          const a1 = proj(uu, STREET_N - 0.16);
+          const b1 = proj(uu, STREET_N + 0.16);
           ctx.beginPath();
           ctx.moveTo(a1.x, a1.y);
           ctx.lineTo(b1.x, b1.y);
           ctx.stroke();
         }
         for (let k = -3; k <= 3; k++) {
-          const vv = FOCUS_V + k * 0.075;
+          const vv = STREET_N + k * 0.075;
           const a1 = proj(FOCUS_U - 0.16, vv);
           const b1 = proj(FOCUS_U + 0.16, vv);
           ctx.beginPath();
@@ -687,32 +858,37 @@ export function CityBuildCanvas({
           ctx.stroke();
         }
 
-        // sidewalk outline around the analysed block
-        ctx.globalAlpha = an * 0.25;
-        ctx.lineWidth = 1;
+        // sidewalk kerb around the analysed block
+        ctx.globalAlpha = an * 0.28;
         poly(
           [
-            proj(focus.u0 - 0.07, focus.v0 - 0.07),
-            proj(focus.u1 + 0.07, focus.v0 - 0.07),
-            proj(focus.u1 + 0.07, focus.v1 + 0.07),
-            proj(focus.u0 - 0.07, focus.v1 + 0.07),
+            proj(focus.u0 - 0.08, focus.v0 - 0.08),
+            proj(focus.u1 + 0.08, focus.v0 - 0.08),
+            proj(focus.u1 + 0.08, focus.v1 + 0.08),
+            proj(focus.u0 - 0.08, focus.v1 + 0.08),
           ],
           undefined,
           mk,
           1
         );
         ctx.globalAlpha = 1;
+
+        // street lamps on the entrance sidewalk + the avenue
+        const glow = 0.5 + dusk * 0.5;
+        drawLamp(focus.cu - 0.55, focus.v1 + 0.17, 0, 0.12, an, glow);
+        drawLamp(focus.cu + 0.55, focus.v1 + 0.17, 0, 0.12, an, glow);
+        drawLamp(focus.u0 - 0.18, focus.cv - 0.75, 0.1, 0, an, glow);
       }
 
       /* ambient traffic — dots far away, real cars once we zoom in */
-      const vehR = seg(p, 0.56, 0.66);
+      const vehR = seg(p, 0.54, 0.64);
       if (vehR > 0) {
         for (const car of vehicles) {
           car.t = (car.t + car.spd * 0.016 * car.dir + 1) % 1;
           const u = car.avenue ? car.lane : 0.5 + car.t * 10.5;
           const v = car.avenue ? V0 + car.t * (V1 - V0) : car.lane;
           const s = proj(u, v, 0.15);
-          if (s.x < -40 || s.x > W + 40 || s.y < -40 || s.y > H + 40) continue;
+          if (s.x < -60 || s.x > W + 60 || s.y < -60 || s.y > H + 60) continue;
           const col =
             car.tone > 0.6 ? pal.accent2 : car.tone > 0.3 ? pal.accent : pal.ped;
           if (focusT > 0.25) {
@@ -732,29 +908,29 @@ export function CityBuildCanvas({
       }
 
       /* ambient pedestrians (distant dots) */
-      const pedR = seg(p, 0.64, 0.72);
+      const pedR = seg(p, 0.62, 0.7);
       if (pedR > 0) {
         for (const pd of peds) {
           pd.t = (pd.t + pd.spd * 0.016 * pd.dir + 1) % 1;
           const vv = V0 + ((pd.v - V0 + pd.t * 24) % (V1 - V0));
           const s = proj(pd.lane, vv, 0.1);
           if (s.x < -20 || s.x > W + 20 || s.y < -20 || s.y > H + 20) continue;
-          ctx.globalAlpha = pedR * 0.75 * (1 - focusT * 0.5);
+          ctx.globalAlpha = pedR * 0.75 * (1 - focusT * 0.7);
           ctx.fillStyle = pal.ped;
           ctx.fillRect(s.x - 1, s.y - 1, 2, 2);
           ctx.globalAlpha = 1;
         }
       }
 
-      /* twin pins (fade back once we focus) */
-      if (twinR > 0 && focusT < 0.9) {
+      /* twin pins (fade away as we dive) */
+      if (twinR > 0 && focusT < 0.6) {
         pins.forEach((pin, i) => {
           const z = heightAt(pin.u, pin.v) * 5.6 + 1.5;
           const s = proj(pin.u, pin.v, z);
           const base = proj(pin.u, pin.v, 0);
           const pulse = 0.5 + 0.5 * Math.sin(time * 2.4 + i);
-          ctx.globalAlpha = twinR * (1 - focusT);
-          ctx.strokeStyle = "rgba(var(--accent-primary-rgb),0.35)";
+          ctx.globalAlpha = twinR * (1 - focusT / 0.6);
+          ctx.strokeStyle = `rgba(${aRGB},0.35)`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(base.x, base.y);
@@ -773,61 +949,79 @@ export function CityBuildCanvas({
         });
       }
 
-      /* ══ ANALYSIS LAYER — real agents around the analysed building ══ */
+      /* ══ ANALYSIS LAYER — live agents at the entrance ══ */
       if (focusT > 0.05) {
         const an = focusT;
-        const fvBase = FOCUS_V;
-        const fuAve = FOCUS_U;
         const fz = focus.h * (1 + 0.35 * focusT) * 5.6;
 
-        // 1 · PUBLIC TRANSIT — the bus crosses, leaving its route line
+        // 1 · PUBLIC TRANSIT — the bus on the entrance street, leaving its line
         {
-          const uE = eastEdge(fvBase) + 0.4;
-          const uW = westEdge(fvBase) - 0.4;
-          const t = (time * 0.055) % 1;
+          const uE = eastEdge(STREET_N) + 0.4;
+          const uW = westEdge(STREET_N) - 0.4;
+          const t = (time * 0.045) % 1;
           const u = uE + t * (uW - uE);
-          const head = proj(u, fvBase, 0.15);
-          const tail = proj(Math.max(uE, u - 3), fvBase, 0.15);
-          trail(head, tail, pal.accent2, clamp(scale * 0.05, 1.5, 3.2), an * 0.85);
-          drawBus(head, dirOf(u, fvBase, u + 0.3, fvBase), an);
+          const head = proj(u, STREET_N + 0.07, 0.12);
+          const tail = proj(Math.max(uE, u - 3), STREET_N + 0.07, 0.12);
+          trail(head, tail, pal.accent2, clamp(scale * 0.05, 1.5, 4), an * 0.85);
+          drawBus(head, dirOf(u, STREET_N, u + 0.3, STREET_N), an);
         }
 
-        // 2 · PARKING ENTRIES — real cars turn off the avenue into the building
+        // 2 · PARKING — cars come down the avenue and drive in through the gate
         for (let k = 0; k < 2; k++) {
-          const t = (time * 0.13 + k * 0.5) % 1;
+          const t = (time * 0.11 + k * 0.5) % 1;
           let u: number;
           let v: number;
           let d: Pt;
-          if (t < 0.6) {
-            const tt = t / 0.6;
-            u = fuAve;
-            v = focus.cv + 5 - tt * 5;
+          if (t < 0.62) {
+            const tt = t / 0.62;
+            u = FOCUS_U - 0.07;
+            v = focus.cv + 4.5 - tt * 4.5;
             d = dirOf(u, v, u, v - 0.3);
           } else {
-            const tt = (t - 0.6) / 0.4;
-            u = fuAve + tt * (focus.u0 + 0.3 - fuAve);
+            const tt = (t - 0.62) / 0.38;
+            u = FOCUS_U - 0.07 + tt * (focus.u0 + 0.25 - (FOCUS_U - 0.07));
             v = focus.cv;
             d = dirOf(u, v, u + 0.3, v);
           }
           const fadeIn = clamp(t * 6);
-          const fadeOut = t > 0.85 ? 1 - (t - 0.85) / 0.15 : 1;
-          const head = proj(u, v, 0.12);
+          const fadeOut = t > 0.86 ? 1 - (t - 0.86) / 0.14 : 1; // swallowed by the gate
+          const head = proj(u, v, 0.1);
           const tail =
-            t < 0.6
-              ? proj(u, Math.min(focus.cv + 5, v + 1.6), 0.12)
-              : proj(fuAve, focus.cv, 0.12);
-          trail(head, tail, pal.accent, clamp(scale * 0.03, 1, 2), an * 0.7 * fadeIn * fadeOut);
+            t < 0.62
+              ? proj(u, Math.min(focus.cv + 4.5, v + 1.6), 0.1)
+              : proj(FOCUS_U - 0.07, focus.cv, 0.1);
+          trail(head, tail, pal.accent, clamp(scale * 0.03, 1, 2.6), an * 0.7 * fadeIn * fadeOut);
           drawCar(head, d, pal.accent, an * fadeIn * fadeOut, 0.9);
         }
 
-        // 3 · SIDEWALK PEDESTRIANS — little people actually walking
+        // 3 · SIDEWALK PEDESTRIANS — people walking along both sidewalks
         for (const wk of walkers) {
           wk.t = (wk.t + wk.spd * 0.016 * wk.dir + 1) % 1;
-          const vSide = wk.side === 0 ? focus.v0 - 0.1 : focus.v1 + 0.1;
+          const vSide = wk.side === 0 ? focus.v0 - 0.12 : focus.v1 + 0.14;
           const u = focus.u0 - 0.5 + wk.t * (focus.u1 - focus.u0 + 1);
           const foot = proj(u, vSide, 0);
-          const phase = time * (5 + wk.spd * 60) + wk.ph;
+          const phase = time * (5 + wk.spd * 70) + wk.ph;
           drawPerson(foot, phase, pal.ped, an * 0.95);
+        }
+
+        // …two of them reach the door and go inside
+        for (const en of enterers) {
+          const t = (time * 0.05 + en.off) % 1;
+          let u: number;
+          let v: number;
+          let alpha = 1;
+          if (t < 0.68) {
+            const tt = t / 0.68;
+            u = focus.cu + en.from * 1.5 * (1 - tt);
+            v = focus.v1 + 0.14;
+          } else {
+            const tt = (t - 0.68) / 0.32;
+            u = focus.cu;
+            v = focus.v1 + 0.14 - tt * 0.13;
+            alpha = tt > 0.55 ? 1 - (tt - 0.55) / 0.45 : 1; // through the door
+          }
+          const foot = proj(u, v, 0);
+          drawPerson(foot, time * 6.2 + en.off * 9, pal.ped, an * alpha);
         }
 
         // 4 · EMISSIONS — wavy lines rising from the rooftop
@@ -837,12 +1031,12 @@ export function CityBuildCanvas({
           if (a <= 0.02) continue;
           ctx.globalAlpha = a;
           ctx.strokeStyle = pal.ped;
-          ctx.lineWidth = clamp(scale * 0.03, 1, 2);
+          ctx.lineWidth = clamp(scale * 0.03, 1, 2.6);
           ctx.beginPath();
           for (let s = 0; s <= 6; s++) {
             const zz = fz + lift * 2.6 + (s / 6) * 0.9;
             const sway = Math.sin(time * 2 + zz * 2.4 + k * 2.1) * 0.14;
-            const pt = proj(focus.cu - 0.18 + sway, focus.v0 + 0.35, zz);
+            const pt = proj(focus.cu - 0.18 + sway, focus.cv, zz);
             if (s === 0) ctx.moveTo(pt.x, pt.y);
             else ctx.lineTo(pt.x, pt.y);
           }
@@ -852,12 +1046,12 @@ export function CityBuildCanvas({
 
         // 5 · ENERGY FEED — dashes flowing along the street into the base
         {
-          const a = proj(fuAve + 2.2, fvBase, 0.05);
-          const b = proj(focus.cu, fvBase, 0.05);
-          const c = proj(focus.cu, focus.v0 + 0.1, 0.05);
+          const a = proj(focus.cu + 2.4, STREET_N, 0.04);
+          const b = proj(focus.cu, STREET_N, 0.04);
+          const c = proj(focus.cu, focus.v1 + 0.05, 0.04);
           ctx.globalAlpha = an * 0.3;
           ctx.strokeStyle = pal.accent;
-          ctx.lineWidth = clamp(scale * 0.03, 1.2, 2.2);
+          ctx.lineWidth = clamp(scale * 0.03, 1.2, 2.6);
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
@@ -877,6 +1071,24 @@ export function CityBuildCanvas({
       }
 
       raf = requestAnimationFrame(draw);
+    };
+
+    /** Fill a facade quad with an arbitrary fillStyle (gradient etc.). */
+    const quadFill = (
+      f: (s: number, h: number) => { x: number; y: number },
+      s0: number,
+      s1: number,
+      h0: number,
+      h1: number,
+      fill: string | CanvasGradient
+    ) => {
+      const pts = [f(s0, h0), f(s1, h0), f(s1, h1), f(s0, h1)];
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
     };
 
     raf = requestAnimationFrame(draw);
