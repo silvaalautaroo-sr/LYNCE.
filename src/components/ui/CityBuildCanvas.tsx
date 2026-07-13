@@ -7,10 +7,9 @@ interface CityBuildCanvasProps {
   /** Fired once when the digital-twin stage begins (HUD appears). */
   onTwinReady?: () => void;
   /**
-   * Optional public-domain aerial photo (e.g. USGS NAIP imagery placed in
-   * /public), cropped like the reference: Central Park vertical in the centre,
-   * north up. Shown as the opening plate, then vectorized by the scanner.
-   * If it renders mirrored or inverted, flip the crop in any editor.
+   * Aerial photo shown at the start (e.g. /central-park.jpg in /public),
+   * cropped like the reference: Central Park vertical, north up.
+   * The scanner consumes it progressively, revealing the code-built twin.
    */
   satelliteImage?: string;
   /** Tag text for the highlighted building. */
@@ -18,25 +17,24 @@ interface CityBuildCanvasProps {
 }
 
 /* ============================================================================
- * CENTRAL PARK — FROM AERIAL IMAGE TO DIGITAL TWIN
+ * CENTRAL PARK — FINAL SEQUENCE
  *
- * Script:
- *   1. IMAGE — the iconic top-down composition: Central Park running
- *      vertically, the reservoir shining, dense city walls on both flanks.
- *      (Recreated procedurally — real geometry, no copyrighted photo.)
- *   2. SCAN  — a scanner sweep climbs the image and vectorizes it: block
- *      footprints become a wireframe twin.
- *   3. RISE  — the buildings extrude out of their footprints.
- *   4. CAMERA — the view tilts from top-down to an oblique 3D angle.
- *   5. TAG   — one building beside the park is painted in the theme accent
- *      and tagged "Simulation Builder" with a leader line.
+ *   1. PHOTO   — the aerial image of NY appears, slightly dimmed.
+ *   2. SCAN    — a scanner line climbs the image; wherever it has passed,
+ *                the photo is replaced by the code-built digital twin (plan).
+ *   3. TWIN    — the city now lives as a flat wireframe twin.
+ *   4. CAMERA  — the view swings to a lateral isometric angle (rotation +
+ *                tilt), so buildings will show TWO faces.
+ *   5. RISE    — the buildings extrude out of their footprints, in 3/4 view.
+ *   6. ZOOM    — the camera pushes into one building beside the park.
+ *   7. TAG     — it is painted in the theme accent: "Simulation Builder".
  * ========================================================================== */
 
 interface Palette {
   land: string;
   satBlock: string;
   wire: string;
-  faceF: string; // front (south) faces
+  faceF: string; // front faces (toward camera)
   faceS: string; // side faces
   top: string;
   park: string;
@@ -92,23 +90,19 @@ const ACCENT_RGB: Record<"dark" | "light", string> = {
   light: "232,131,79",
 };
 
-/* ── Manhattan frame around Central Park ─────────────────────────────────────
- * u = avenue axis (0 ≈ East River side, 11.5 ≈ Hudson side), x = u × AVE
- * v = street number. Central Park: 5th→8th Ave (u 5–8), 59th→110th St.
- * View window: streets 70–98 (park runs off both edges, like the photo).
- * ROT = π → north up, west on the left, camera tilting in from the south.
- */
+/* ── Manhattan frame around Central Park ──────────────────────────────────── */
 const AVE = 3.5;
-const UC = 6.5; // framing centred on the park (like the reference composition)
-const VB0 = 60; // built range (beyond the view for tilt/zoom margins)
+const UC = 6.5; // framing centred on the park (like the reference photo)
+const VB0 = 60;
 const VB1 = 108;
-const VW0 = 70; // view window
+const VW0 = 70;
 const VW1 = 98;
 const VC = (VW0 + VW1) / 2;
 const PARK = { u0: 5, u1: 8, v0: 59, v1: 110 };
-const ROT = Math.PI;
+const ROT_BASE = Math.PI; // top-down: north up, west left
+const ROT_ISO = -0.55; // extra swing for the lateral isometric view (~31°)
 const PITCH_END = 0.62;
-const HI_ZOOM = 2.0;
+const HI_ZOOM = 2.4;
 
 const rnd = (a: number, b: number) => {
   const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
@@ -121,7 +115,6 @@ const smooth = (t: number) => t * t * (3 - 2 * t);
 const inPark = (u: number, v: number) =>
   u >= PARK.u0 && u < PARK.u1 && v >= PARK.v0 && v < PARK.v1;
 
-/** Height profile: tall Midtown wall at the bottom, park frontlines raised. */
 const heightAt = (u: number, v: number) => {
   const midtown = Math.max(0, 68 - v) * 0.065;
   const frontline = u === 4 || u === 8 ? 0.18 : 0;
@@ -135,6 +128,8 @@ interface Block {
   v1: number;
   cu: number;
   cv: number;
+  wx: number; // world x of centre (precomputed)
+  wy: number; // world y of centre
   h: number;
   lit: boolean;
   order: number;
@@ -175,9 +170,6 @@ export function CityBuildCanvas({
     const pal = PALETTES[theme];
     const aRGB = ACCENT_RGB[theme];
 
-    const cosR = Math.cos(ROT);
-    const sinR = Math.sin(ROT);
-
     let img: HTMLImageElement | null = null;
     if (satelliteImage) {
       const im = new Image();
@@ -199,6 +191,8 @@ export function CityBuildCanvas({
           v1: v + 1.75,
           cu: u + 0.5,
           cv: v + 1,
+          wx: (u + 0.5 - UC) * AVE,
+          wy: v + 1 - VC,
           h: heightAt(u, v),
           lit: rnd(u * 3.1, v * 5.7) > 0.4,
           order: (v - VB0) / (VB1 - VB0),
@@ -206,7 +200,6 @@ export function CityBuildCanvas({
         });
       }
     }
-    // the analysed building: beside the park on the west frontline (CPW)
     let hb = blocks[0];
     let best = 1e9;
     for (const b of blocks) {
@@ -218,10 +211,7 @@ export function CityBuildCanvas({
     }
     hb.hi = true;
     hb.h = Math.max(hb.h, 0.85);
-    // painter's order: far (north, larger v) first
-    blocks.sort((a, b) => b.cv - a.cv);
 
-    // park foliage speckles
     const foliage = Array.from({ length: 260 }, (_, i) => ({
       u: PARK.u0 + 0.12 + rnd(i, 61) * (PARK.u1 - PARK.u0 - 0.24),
       v: VB0 + rnd(i, 62) * (VB1 - VB0),
@@ -229,7 +219,6 @@ export function CityBuildCanvas({
       tone: rnd(i, 64),
     }));
 
-    // the reservoir (wobbly ellipse, streets 86–96)
     const reservoir: { u: number; v: number }[] = [];
     for (let i = 0; i < 26; i++) {
       const a = (i / 26) * Math.PI * 2;
@@ -240,15 +229,13 @@ export function CityBuildCanvas({
       });
     }
 
-    // meadows (lighter green patches)
     const meadows = [
-      { u0: 5.7, u1: 7.3, v0: 79.2, v1: 84.4, r: 0.5 }, // Great Lawn
-      { u0: 5.4, u1: 7.0, v0: 97.2, v1: 101.6, r: 0.5 }, // North Meadow
-      { u0: 5.2, u1: 6.4, v0: 66.2, v1: 69.4, r: 0.4 }, // Sheep Meadow
+      { u0: 5.7, u1: 7.3, v0: 79.2, v1: 84.4 },
+      { u0: 5.4, u1: 7.0, v0: 97.2, v1: 101.6 },
+      { u0: 5.2, u1: 6.4, v0: 66.2, v1: 69.4 },
     ];
-    const transverses = [79.1, 85.7, 96.7]; // park crossings
+    const transverses = [79.1, 85.7, 96.7];
 
-    // avenue traffic (5th Ave + Central Park West)
     const cars = Array.from({ length: 10 }, (_, i) => ({
       lane: i % 2 === 0 ? 5.0 : 8.03,
       t: rnd(i, 71),
@@ -265,6 +252,8 @@ export function CityBuildCanvas({
     let ox = 0;
     let oy = 0;
     let pitch = 0;
+    let cosR = -1; // updated per frame (rotation is animated)
+    let sinR = 0;
 
     const proj = (u: number, v: number, z = 0) => {
       const x = (u - UC) * AVE;
@@ -326,7 +315,7 @@ export function CityBuildCanvas({
       ctx.closePath();
     };
 
-    /** Extrude a rectangular block: back walls first, front last, then top. */
+    /** Extrude a block: back walls first, front last, then the roof. */
     const drawPrism = (
       foot: Pt[],
       top: Pt[],
@@ -354,33 +343,35 @@ export function CityBuildCanvas({
     };
 
     const start = performance.now();
-    const DURATION = 12000;
+    const DURATION = 13000;
     let raf = 0;
 
     const draw = (now: number) => {
       const p = clamp((now - start) / DURATION);
       const time = now / 1000;
 
-      if (!twinFired.current && p > 0.72) {
+      if (!twinFired.current && p > 0.74) {
         twinFired.current = true;
         onTwinReady?.();
       }
 
-      /* phase map */
-      const scan = seg(p, 0.1, 0.32); // the sweep climbs the image
-      const sat = 1 - seg(p, 0.14, 0.34); // imagery dissolves into vectors
-      const rise = smooth(seg(p, 0.34, 0.56));
-      const tilt = smooth(seg(p, 0.56, 0.72));
-      const duskA = seg(p, 0.6, 0.74);
-      const lifeA = seg(p, 0.64, 0.74);
-      const hiT = smooth(seg(p, 0.74, 0.92));
+      /* ── phase map (the final script) ── */
+      const scan = seg(p, 0.06, 0.28); // 2. the scanner climbs the image
+      const sat = 1 - seg(p, 0.26, 0.34); // procedural plate fallback fade
+      const camT = smooth(seg(p, 0.36, 0.56)); // 4. swing to lateral isometric
+      const rise = smooth(seg(p, 0.56, 0.74)); // 5. buildings rise, in 3/4 view
+      const duskA = seg(p, 0.64, 0.78);
+      const lifeA = seg(p, 0.68, 0.78);
+      const hiT = smooth(seg(p, 0.78, 0.96)); // 6-7. zoom + paint + tag
 
-      pitch = 0.14 * rise + (PITCH_END - 0.14) * tilt;
-
-      /* camera: push toward the tagged building */
+      /* camera: animated rotation + tilt, then push-in */
+      const rot = ROT_BASE + ROT_ISO * camT;
+      cosR = Math.cos(rot);
+      sinR = Math.sin(rot);
+      pitch = PITCH_END * camT;
       scale = baseScale * (1 + (HI_ZOOM - 1) * hiT);
-      const frx = (hb.cu - UC) * AVE * cosR - (hb.cv - VC) * sinR;
-      const fry = (hb.cu - UC) * AVE * sinR + (hb.cv - VC) * cosR;
+      const frx = hb.wx * cosR - hb.wy * sinR;
+      const fry = hb.wx * sinR + hb.wy * cosR;
       const fz = hb.h * 5.2 * (1 + 0.4 * hiT) * 0.5;
       const desOx = W / 2 - frx * scale;
       const desOy =
@@ -388,13 +379,18 @@ export function CityBuildCanvas({
       ox = baseOx + (desOx - baseOx) * hiT;
       oy = baseOy + (desOy - baseOy) * hiT;
 
+      /* painter's order follows the animated rotation */
+      blocks.sort(
+        (a, b) => a.wx * sinR + a.wy * cosR - (b.wx * sinR + b.wy * cosR)
+      );
+
       ctx.clearRect(0, 0, W, H);
 
       /* ground */
       ctx.fillStyle = pal.land;
       ctx.fillRect(0, 0, W, H);
 
-      /* ── Central Park strip ── */
+      /* ── Central Park ── */
       poly(
         [
           proj(PARK.u0, VB0 - 2),
@@ -404,7 +400,6 @@ export function CityBuildCanvas({
         ],
         pal.park
       );
-      // foliage speckles
       for (const f of foliage) {
         ctx.globalAlpha = 0.5;
         ctx.fillStyle = f.tone > 0.5 ? pal.meadow : pal.parkDark;
@@ -414,7 +409,6 @@ export function CityBuildCanvas({
         ctx.fill();
         ctx.globalAlpha = 1;
       }
-      // meadows
       for (const m of meadows) {
         ctx.globalAlpha = 0.9;
         poly(
@@ -423,7 +417,6 @@ export function CityBuildCanvas({
         );
         ctx.globalAlpha = 1;
       }
-      // transverse roads crossing the park
       ctx.strokeStyle = pal.land;
       ctx.lineWidth = clamp(scale * 0.05, 1, 3);
       for (const tv of transverses) {
@@ -434,7 +427,6 @@ export function CityBuildCanvas({
         ctx.lineTo(b.x, b.y);
         ctx.stroke();
       }
-      // the reservoir
       poly(
         reservoir.map((q) => proj(q.u, q.v)),
         pal.water,
@@ -442,17 +434,16 @@ export function CityBuildCanvas({
         1
       );
 
-      /* the real aerial photo: shown at the start, then CONSUMED by the
-         scanner — the photo survives only north of the sweep line, and the
-         code-built twin is revealed behind it */
-      if (img && p < 0.42) {
-        const photoA = 1 - seg(p, 0.31, 0.37);
+      /* 1-2. the aerial photo, slightly dimmed, consumed by the scanner.
+         (Photo phase lives entirely before the camera swing, so the frontal
+         mapping below stays valid.) */
+      if (img && p < 0.36) {
+        const photoA = 1 - seg(p, 0.28, 0.34);
         if (photoA > 0.01) {
           const dw = 11.5 * AVE;
           const dh = VB1 - VB0;
           const x0 = -(11.5 - UC) * AVE;
           const y0 = -(VB1 - VC);
-          // aspect-preserving centre crop (object-fit: cover)
           const destAspect = dw / dh;
           const imgAspect = img.width / img.height;
           let sx = 0;
@@ -467,17 +458,17 @@ export function CityBuildCanvas({
             sy = (img.height - sh) / 2;
           }
           ctx.save();
-          ctx.globalAlpha = photoA * 0.97;
+          ctx.globalAlpha = photoA * 0.82; // "un poco opaca"
           ctx.translate(ox, oy);
           ctx.scale(scale, scale * Math.cos(pitch));
           if (scan > 0) {
             const vS = VB0 + scan * (VB1 - VB0);
             const yS = -(vS - VC);
             ctx.beginPath();
-            ctx.rect(x0, y0, dw, yS - y0); // keep only the unscanned (north) part
+            ctx.rect(x0, y0, dw, yS - y0); // photo survives only north of the sweep
             ctx.clip();
           }
-          ctx.filter = "saturate(0.8)";
+          ctx.filter = "saturate(0.7) brightness(0.85)";
           ctx.drawImage(img, sx, sy, sw, sh, x0, y0, dw, dh);
           ctx.filter = "none";
           ctx.restore();
@@ -485,7 +476,7 @@ export function CityBuildCanvas({
         }
       }
 
-      /* ── blocks: image plate → wireframe → volumes ── */
+      /* ── blocks: plan plates → wireframe twin → extrusion ── */
       const plateA = img ? 0 : 1;
       const mX = 3 * scale;
       for (const b of blocks) {
@@ -500,7 +491,7 @@ export function CityBuildCanvas({
           proj(b.u0, b.v1),
         ];
 
-        if (sat > 0.01) {
+        if (sat > 0.01 && plateA > 0) {
           const shade = 0.7 + rnd(b.cu * 9, b.cv * 7) * 0.45;
           ctx.globalAlpha = sat * plateA;
           poly(foot, shadeHex(pal.satBlock, shade));
@@ -509,7 +500,8 @@ export function CityBuildCanvas({
 
         if (scan <= b.order) continue;
 
-        const wireA = clamp((scan - b.order) * 6) * (1 - rise * 0.75);
+        // 3. the flat wireframe twin (persists until the rise consumes it)
+        const wireA = clamp((scan - b.order) * 6) * (1 - rise * 0.8);
         if (wireA > 0.01) {
           ctx.globalAlpha = wireA * 0.9;
           poly(foot, undefined, pal.wire, 1);
@@ -544,7 +536,6 @@ export function CityBuildCanvas({
           ctx.globalAlpha = 1;
         }
 
-        // dusk windows on the city walls
         if (duskA > 0 && b.lit && z > 1.4 && !b.hi) {
           const c = proj(b.cu, b.cv, z * 0.55);
           const tw = 0.55 + 0.45 * Math.sin(time * 2 + b.cu * 3 + b.cv);
@@ -581,7 +572,7 @@ export function CityBuildCanvas({
           car.t = (car.t + car.spd * 0.016 * car.dir + 1) % 1;
           const v = VB0 + car.t * (VB1 - VB0);
           const s = proj(car.lane, v, 0.06);
-          if (s.y < -20 || s.y > H + 20) continue;
+          if (s.y < -20 || s.y > H + 20 || s.x < -20 || s.x > W + 20) continue;
           ctx.globalAlpha = lifeA * 0.9;
           ctx.fillStyle = car.lane < 6 ? pal.accent : pal.accent2;
           ctx.beginPath();
@@ -591,7 +582,7 @@ export function CityBuildCanvas({
         }
       }
 
-      /* the "Simulation Builder" tag */
+      /* 7. the "Simulation Builder" tag */
       if (hiT > 0.15) {
         const A = seg(hiT, 0.15, 0.6);
         const z = hb.h * rise * 5.2 * (1 + 0.4 * hiT);
@@ -607,7 +598,6 @@ export function CityBuildCanvas({
         const tagY = clamp(tip.y - scale * 1.6 + floatY, 8, H - tagH - 8);
 
         ctx.globalAlpha = A;
-        // leader + anchor
         ctx.strokeStyle = pal.accent2;
         ctx.lineWidth = 1.2;
         ctx.beginPath();
@@ -623,7 +613,6 @@ export function CityBuildCanvas({
         ctx.beginPath();
         ctx.arc(tip.x, tip.y, 5 + pulse * 6, 0, Math.PI * 2);
         ctx.stroke();
-        // pill
         ctx.fillStyle = pal.tagBg;
         ctx.strokeStyle = `rgba(${aRGB},0.65)`;
         ctx.lineWidth = 1;
