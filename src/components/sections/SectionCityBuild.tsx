@@ -95,7 +95,11 @@ export function SectionCityBuild() {
           className="glass relative aspect-[16/11] w-full overflow-hidden rounded-3xl sm:aspect-[16/9]"
         >
           {mounted && (
-            <CityBuildCanvas theme={theme} onTwinReady={handleTwinReady} />
+            <CityBuildCanvas
+              theme={theme}
+              onTwinReady={handleTwinReady}
+              satelliteImage="/central-park.jpg"
+            />
           )}
 
           {/* Live "digital twin" HUD label */}
@@ -106,7 +110,7 @@ export function SectionCityBuild() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6, ease }}
-                className="glass-strong absolute left-4 top-4 flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-ink"
+                className="glass-strong absolute left-3 top-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem] font-medium text-ink sm:left-4 sm:top-4 sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-xs"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-primary opacity-70" />
@@ -125,21 +129,21 @@ export function SectionCityBuild() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.7, delay: 0.15, ease }}
-                className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-2.5 sm:inset-x-6 sm:bottom-6 sm:flex sm:flex-wrap"
+                className="absolute inset-x-3 bottom-3 grid grid-cols-2 gap-1.5 sm:inset-x-6 sm:bottom-6 sm:flex sm:flex-wrap sm:gap-2.5"
               >
                 {chips.map((c) => {
                   const Icon = c.icon;
                   return (
                     <div
                       key={c.label}
-                      className="glass-strong flex items-center gap-2.5 rounded-xl px-3.5 py-2.5"
+                      className="glass-strong flex items-center gap-1.5 rounded-lg px-2 py-1.5 sm:gap-2.5 sm:rounded-xl sm:px-3.5 sm:py-2.5"
                     >
-                      <Icon className="h-4 w-4 text-accent-primary" strokeWidth={1.5} />
+                      <Icon className="h-3 w-3 shrink-0 text-accent-primary sm:h-4 sm:w-4" strokeWidth={1.5} />
                       <div className="leading-tight">
-                        <div className="text-[0.62rem] uppercase tracking-[0.14em] text-ink-faint">
+                        <div className="text-[0.5rem] uppercase tracking-[0.12em] text-ink-faint sm:text-[0.62rem] sm:tracking-[0.14em]">
                           {c.label}
                         </div>
-                        <div className="font-feature-tabular text-sm font-medium text-ink">
+                        <div className="font-feature-tabular text-[0.7rem] font-medium text-ink sm:text-sm">
                           {c.value}
                         </div>
                       </div>
