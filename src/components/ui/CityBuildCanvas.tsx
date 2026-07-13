@@ -442,25 +442,51 @@ export function CityBuildCanvas({
         1
       );
 
-      /* optional real aerial plate */
-      if (img && sat > 0.01) {
-        ctx.save();
-        ctx.globalAlpha = sat * 0.9;
-        ctx.translate(ox, oy);
-        ctx.scale(scale, scale * Math.cos(pitch));
-        ctx.rotate(ROT);
-        ctx.scale(1, -1);
-        ctx.filter = "saturate(0.55) brightness(0.95)";
-        const x0 = (0 - UC) * AVE;
-        const y0 = VB0 - VC;
-        ctx.drawImage(img, x0, y0, 11.5 * AVE, VB1 - VB0);
-        ctx.filter = "none";
-        ctx.restore();
-        ctx.globalAlpha = 1;
+      /* the real aerial photo: shown at the start, then CONSUMED by the
+         scanner — the photo survives only north of the sweep line, and the
+         code-built twin is revealed behind it */
+      if (img && p < 0.42) {
+        const photoA = 1 - seg(p, 0.31, 0.37);
+        if (photoA > 0.01) {
+          const dw = 11.5 * AVE;
+          const dh = VB1 - VB0;
+          const x0 = -(11.5 - UC) * AVE;
+          const y0 = -(VB1 - VC);
+          // aspect-preserving centre crop (object-fit: cover)
+          const destAspect = dw / dh;
+          const imgAspect = img.width / img.height;
+          let sx = 0;
+          let sy = 0;
+          let sw = img.width;
+          let sh = img.height;
+          if (imgAspect > destAspect) {
+            sw = img.height * destAspect;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / destAspect;
+            sy = (img.height - sh) / 2;
+          }
+          ctx.save();
+          ctx.globalAlpha = photoA * 0.97;
+          ctx.translate(ox, oy);
+          ctx.scale(scale, scale * Math.cos(pitch));
+          if (scan > 0) {
+            const vS = VB0 + scan * (VB1 - VB0);
+            const yS = -(vS - VC);
+            ctx.beginPath();
+            ctx.rect(x0, y0, dw, yS - y0); // keep only the unscanned (north) part
+            ctx.clip();
+          }
+          ctx.filter = "saturate(0.8)";
+          ctx.drawImage(img, sx, sy, sw, sh, x0, y0, dw, dh);
+          ctx.filter = "none";
+          ctx.restore();
+          ctx.globalAlpha = 1;
+        }
       }
 
       /* ── blocks: image plate → wireframe → volumes ── */
-      const plateA = img ? 0.3 : 1;
+      const plateA = img ? 0 : 1;
       const mX = 3 * scale;
       for (const b of blocks) {
         const c0 = proj(b.cu, b.cv, 0);
