@@ -6,12 +6,6 @@ interface CityBuildCanvasProps {
   theme: "dark" | "light";
   /** Fired once when the digital-twin stage begins (HUD appears). */
   onTwinReady?: () => void;
-  /**
-   * Aerial photo shown at the start (e.g. /central-park.jpg in /public),
-   * cropped like the reference: Central Park vertical, north up.
-   * The scanner consumes it progressively, revealing the code-built twin.
-   */
-  satelliteImage?: string;
   /** Tag text for the highlighted building. */
   label?: string;
 }
@@ -19,9 +13,9 @@ interface CityBuildCanvasProps {
 /* ============================================================================
  * CENTRAL PARK — FINAL SEQUENCE
  *
- *   1. PHOTO   — the aerial image of NY appears, slightly dimmed.
- *   2. SCAN    — a scanner line climbs the image; wherever it has passed,
- *                the photo is replaced by the code-built digital twin (plan).
+ *   1. PLATE   — the top-down satellite-style view of the city (all code).
+ *   2. SCAN    — a scanner line climbs the plate; wherever it has passed,
+ *                the imagery becomes the digital twin (plan view).
  *   3. TWIN    — the city now lives as a flat wireframe twin.
  *   4. CAMERA  — the view swings to a lateral isometric angle (rotation +
  *                tilt), so buildings will show TWO faces.
@@ -156,7 +150,6 @@ function mixHex(c1: string, c2: string, t: number) {
 export function CityBuildCanvas({
   theme,
   onTwinReady,
-  satelliteImage,
   label = "Simulation Builder",
 }: CityBuildCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -169,15 +162,6 @@ export function CityBuildCanvas({
     if (!ctx) return;
     const pal = PALETTES[theme];
     const aRGB = ACCENT_RGB[theme];
-
-    let img: HTMLImageElement | null = null;
-    if (satelliteImage) {
-      const im = new Image();
-      im.src = satelliteImage;
-      im.onload = () => {
-        img = im;
-      };
-    }
 
     /* ── build the city once ──────────────────────────────────────────────── */
     const blocks: Block[] = [];
@@ -434,50 +418,7 @@ export function CityBuildCanvas({
         1
       );
 
-      /* 1-2. the aerial photo, slightly dimmed, consumed by the scanner.
-         (Photo phase lives entirely before the camera swing, so the frontal
-         mapping below stays valid.) */
-      if (img && p < 0.36) {
-        const photoA = 1 - seg(p, 0.28, 0.34);
-        if (photoA > 0.01) {
-          const dw = 11.5 * AVE;
-          const dh = VB1 - VB0;
-          const x0 = -(11.5 - UC) * AVE;
-          const y0 = -(VB1 - VC);
-          const destAspect = dw / dh;
-          const imgAspect = img.width / img.height;
-          let sx = 0;
-          let sy = 0;
-          let sw = img.width;
-          let sh = img.height;
-          if (imgAspect > destAspect) {
-            sw = img.height * destAspect;
-            sx = (img.width - sw) / 2;
-          } else {
-            sh = img.width / destAspect;
-            sy = (img.height - sh) / 2;
-          }
-          ctx.save();
-          ctx.globalAlpha = photoA * 0.82; // "un poco opaca"
-          ctx.translate(ox, oy);
-          ctx.scale(scale, scale * Math.cos(pitch));
-          if (scan > 0) {
-            const vS = VB0 + scan * (VB1 - VB0);
-            const yS = -(vS - VC);
-            ctx.beginPath();
-            ctx.rect(x0, y0, dw, yS - y0); // photo survives only north of the sweep
-            ctx.clip();
-          }
-          ctx.filter = "saturate(0.7) brightness(0.85)";
-          ctx.drawImage(img, sx, sy, sw, sh, x0, y0, dw, dh);
-          ctx.filter = "none";
-          ctx.restore();
-          ctx.globalAlpha = 1;
-        }
-      }
-
       /* ── blocks: plan plates → wireframe twin → extrusion ── */
-      const plateA = img ? 0 : 1;
       const mX = 3 * scale;
       for (const b of blocks) {
         const c0 = proj(b.cu, b.cv, 0);
@@ -491,9 +432,9 @@ export function CityBuildCanvas({
           proj(b.u0, b.v1),
         ];
 
-        if (sat > 0.01 && plateA > 0) {
+        if (sat > 0.01) {
           const shade = 0.7 + rnd(b.cu * 9, b.cv * 7) * 0.45;
-          ctx.globalAlpha = sat * plateA;
+          ctx.globalAlpha = sat;
           poly(foot, shadeHex(pal.satBlock, shade));
           ctx.globalAlpha = 1;
         }
@@ -637,7 +578,7 @@ export function CityBuildCanvas({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [theme, onTwinReady, satelliteImage, label]);
+  }, [theme, onTwinReady, label]);
 
   return <canvas ref={canvasRef} className="h-full w-full" />;
 }
