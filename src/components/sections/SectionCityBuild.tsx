@@ -95,11 +95,7 @@ export function SectionCityBuild() {
           className="glass relative aspect-[16/11] w-full overflow-hidden rounded-3xl sm:aspect-[16/9]"
         >
           {mounted && (
-            <CityBuildCanvas
-              theme={theme}
-              onTwinReady={handleTwinReady}
-              satelliteImage="/central-park.jpg"
-            />
+            <CityBuildCanvas theme={theme} onTwinReady={handleTwinReady} />
           )}
 
           {/* Live "digital twin" HUD label */}
