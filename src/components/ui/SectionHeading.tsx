@@ -36,7 +36,6 @@ export function SectionHeading({
         >
           <span className="h-px w-6 bg-accent-primary/60" />
           <span className="keyword-gradient">{eyebrow}</span>
-          {eyebrow}
         </motion.p>
       )}
       <motion.h2
