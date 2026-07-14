@@ -4,11 +4,11 @@
     "description": "Lynce conecta cada tecnología, cada empresa y cada fuente de datos de la ciudad en un solo ecosistema inteligente."
   },
   "hero": {
-    "line1": "Visión",
-    "line2": "Inteligente",
-    "line3": "para",
-    "line4Part1": "Ciudades",
-    "line4Part2": "Inteligentes"
+    "line1": "Smart",
+    "line2": "Sight",
+    "line3": "for",
+    "line4Part1": "Smart",
+    "line4Part2": "Cities"
   },
   "nav": {
     "platform": "Plataforma",
@@ -217,7 +217,7 @@
   "cityBuild": {
     "eyebrow": "Gemelo Digital",
     "title": "La ciudad cobra vida.",
-    "subtitle": "De un terreno vacío a un gemelo digital vivo: cada capa que agrega Lynce hace que la ciudad empiece a pensar.",
+    "subtitle": "De la imagen satelital al gemelo digital: Lynce escanea el territorio real, reconstruye su geometría en 3D y la pone a pensar con datos en vivo.",
     "twin": {
       "liveLabel": "Datos en tiempo real",
       "traffic": "Tráfico",
