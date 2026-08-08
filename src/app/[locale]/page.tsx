@@ -1,5 +1,3 @@
-"use client";
-
 import { HeroCity } from "@/components/sections/HeroCity";
 import { Section1Problem } from "@/components/sections/Section1Problem";
 import { Section2Ecosystem } from "@/components/sections/Section2Ecosystem";
@@ -8,24 +6,21 @@ import { Section4OwnSolutions } from "@/components/sections/Section4OwnSolutions
 import { Section5Technology } from "@/components/sections/Section5Technology";
 import { Section6Vision } from "@/components/sections/Section6Vision";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
 
 export default function HomePage() {
-  const t = useTranslations();
-
   return (
     <>
       <HeroCity />
       
-      {/* Nueva frase bajo hero */}
+      {/* NUEVA FRASE BAJO HERO */}
       <motion.div 
-        className="w-full py-12 bg-dark"
+        className="w-full py-8 text-center"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <motion.p
-          className="mx-auto max-w-4xl px-6 text-center"
+          className="mx-auto max-w-4xl px-6"
           style={{
             fontSize: "clamp(1.1rem, 3vw, 1.5rem)",
             lineHeight: 1.4,
@@ -40,44 +35,9 @@ export default function HomePage() {
         </motion.p>
       </motion.div>
 
-      {/* NUEVO ORDEN DE SECCIONES */}
+      {/* ORDEN ORIGINAL DE SECCIONES */}
       <Section1Problem />
       <Section2Ecosystem />
       <Section3Platform />
       <Section4OwnSolutions />
       <Section5Technology />
-      <Section6Vision />
-
-      {/* SECCIÓN DE CONTACTO */}
-      <section id="contact" className="w-full py-20 bg-dark relative overflow-hidden">
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <p className="text-sm font-medium text-accent-primary uppercase tracking-wider mb-4">
-              {t("section6.eyebrow")}
-            </p>
-            <h2 className="text-4xl md:text-5xl font-bold text-ink mb-6">
-              {t("section6.title")}
-            </h2>
-            <p className="text-lg text-ink-muted max-w-2xl mx-auto mb-10">
-              {t("section6.body")}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
-                href="mailto:hola@lynce.tech"
-                className="animated-border glass px-8 py-3 rounded-full text-ink font-medium hover:brightness-110 transition"
-              >
-                {t("cta.talkToUs")}
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </>
-  );
-}
