@@ -55,3 +55,29 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <p className="text-sm font-medium text-accent-primary uppercase tracking-wider mb-4">
+              {t("section6.eyebrow")}
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-ink mb-6">
+              {t("section6.title")}
+            </h2>
+            <p className="text-lg text-ink-muted max-w-2xl mx-auto mb-10">
+              {t("section6.body")}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a 
+                href="mailto:hola@lynce.tech"
+                className="animated-border glass px-8 py-3 rounded-full text-ink font-medium hover:brightness-110 transition"
+              >
+                {t("cta.talkToUs")}
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </>
+  );
+}
