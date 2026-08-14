@@ -16,7 +16,7 @@ export function Section1Problem() {
   return (
     <section
       id="problem"
-      className="relative overflow-hidden py-32 lg:py-40"
+      className="relative overflow-hidden py-20 lg:py-28"
     >
       <div className="container mx-auto max-w-6xl px-6">
         <div className="grid gap-16 lg:grid-cols-2 lg:gap-20">

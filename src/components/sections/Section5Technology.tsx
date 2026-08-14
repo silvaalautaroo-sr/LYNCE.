@@ -31,7 +31,7 @@ export function Section5Technology() {
   return (
     <section
       id="technology"
-      className="relative overflow-hidden py-32 lg:py-40"
+      className="relative overflow-hidden py-20 lg:py-28"
     >
       <div className="container mx-auto max-w-6xl px-6">
         <SectionHeading

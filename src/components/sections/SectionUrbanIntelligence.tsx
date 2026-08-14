@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { formatTextWithBold } from "@/lib/format";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -30,7 +31,7 @@ export function SectionUrbanIntelligence() {
   const paragraphs = t.raw("paragraphs") as string[];
 
   return (
-    <section id="technology" className="relative overflow-hidden py-32 lg:py-40">
+    <section id="difference" className="relative overflow-hidden py-20 lg:py-28">
       <div className="container mx-auto max-w-6xl px-6">
         <div className="max-w-3xl">
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
@@ -44,33 +45,28 @@ export function SectionUrbanIntelligence() {
                 transition={{ duration: 0.65, delay: 0.1 + i * 0.08, ease }}
                 className="text-base leading-relaxed text-ink-muted sm:text-lg"
               >
-                {p}
+                {formatTextWithBold(p)}
               </motion.p>
             ))}
           </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
           {TILES.map((tile, i) => {
             const Icon = tile.icon;
             return (
               <motion.div
                 key={tile.key}
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.55, delay: i * 0.06, ease }}
-                whileHover={{ y: -6 }}
-                className="glass group flex flex-col items-center gap-3 rounded-2xl px-3 py-6 text-center transition-colors duration-500 hover:border-accent-primary/40 hover:shadow-[0_0_30px_rgba(var(--accent-primary-rgb),0.16)]"
+                transition={{ duration: 0.5, delay: i * 0.05, ease }}
+                className="glass flex flex-col items-center justify-center gap-4 rounded-2xl p-5 text-center cursor-default select-none border border-white/5 bg-gradient-to-b from-white/[0.04] to-transparent shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
               >
-                <motion.span
-                  whileHover={{ rotate: [0, -8, 8, 0], scale: 1.12 }}
-                  transition={{ duration: 0.6, ease }}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl text-ink-faint transition-colors duration-300 group-hover:text-accent-primary"
-                >
-                  <Icon className="h-6 w-6" strokeWidth={1.4} />
-                </motion.span>
-                <span className="text-xs font-medium leading-tight text-ink-muted transition-colors duration-300 group-hover:text-ink">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary/10 border border-accent-primary/20 text-accent-primary shadow-[0_0_25px_rgba(var(--accent-primary-rgb),0.12)]">
+                  <Icon className="h-8 w-8 sm:h-9 sm:w-9" strokeWidth={1.6} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium tracking-tight text-ink/90 leading-snug">
                   {t(`tiles.${tile.key}`)}
                 </span>
               </motion.div>

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Mail } from "lucide-react";
 import { Logo } from "./Logo";
-import { ThemeToggle } from "./ThemeToggle";
+
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { cn } from "@/lib/utils";
@@ -59,10 +59,7 @@ export function Header() {
               <LocaleSwitcher />
             </div>
 
-            {/* Theme toggle */}
-            <div className="nav-item-wrap">
-              <ThemeToggle />
-            </div>
+
 
             {/* CTA */}
             <MagneticButton
@@ -70,7 +67,10 @@ export function Header() {
               ariaLabel={tCta("talkToUs")}
               className="nav-cta-btn"
             >
-              {tCta("talkToUs")}
+              <span className="flex items-center gap-2">
+                <Mail className="h-3.5 w-3.5 text-accent-primary" />
+                <span>{tCta("talkToUs")}</span>
+              </span>
             </MagneticButton>
           </div>
 
@@ -107,9 +107,11 @@ export function Header() {
               <div className="flex items-center justify-between pt-1 border-t border-border">
                 <LocaleSwitcher />
                 <div className="flex items-center gap-2">
-                  <ThemeToggle />
-                  <MagneticButton onClick={scrollToContact}>
-                    {tCta("talkToUs")}
+                  <MagneticButton onClick={scrollToContact} ariaLabel={tCta("talkToUs")}>
+                    <span className="flex items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 text-accent-primary" />
+                      <span>{tCta("talkToUs")}</span>
+                    </span>
                   </MagneticButton>
                 </div>
               </div>

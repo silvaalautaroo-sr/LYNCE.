@@ -11,11 +11,13 @@
     "line4Part2": "Cities"
   },
   "nav": {
-    "platform": "Platform",
-    "ecosystem": "Ecosystem",
-    "technology": "Technology",
+    "intro": "About Us",
+    "product": "Product",
+    "cases": "Application Cases",
+    "digitalTwin": "Digital Twin",
+    "difference": "Technology",
     "vision": "Vision",
-    "about": "About",
+    "team": "Team",
     "contact": "Contact",
     "brand": "Lynce"
   },
@@ -29,7 +31,7 @@
     "en": "EN"
   },
   "cta": {
-    "talkToUs": "Talk to us"
+    "talkToUs": "Work with us"
   },
   "section1": {
     "eyebrow": "The problem",
@@ -129,51 +131,104 @@
     "subtext": "Lynce exists to be that collaboration."
   },
   "footer": {
-    "tagline": "Smart things for smart cities.",
+    "tagline": "Smart sight for smart cities.",
     "navTitle": "Navigation",
     "contactTitle": "Contact",
     "email": "hola@lynce.tech",
     "rights": "All rights reserved."
   },
+  "usp": {
+    "title": "Simulate the impact of urban projects before building them",
+    "pre": "Simulate the impact of ",
+    "highlight": "urban projects",
+    "post": " before building them"
+  },
   "intro": {
-    "pre": "Lynce is an Argentine startup building the digital infrastructure that connects, organizes, and powers the technologies of a ",
-    "highlight": "smart city",
-    "post": "."
+    "eyebrow": "What is Lynce?",
+    "paragraphs": [
+      "Lynce is the strategic partner for those designing the cities of tomorrow. Through advanced technology, we simulate the construction of urban projects to **evaluate their environmental, social, and economic impact**.",
+      "We analyze critical variables and help understand the true impact of urban decisions, enabling construction companies and organizations to **optimize resources, mitigate risks, and achieve greater benefits** starting from the <gradient>planning stage.</gradient>"
+    ],
+    "console": {
+      "motor": "LYNCE ENGINE",
+      "twinPlusAi": "DIGITAL TWIN + AI",
+      "evaluation": "MULTIVARIABLE EVALUATION",
+      "horizon": "HORIZON: PRE-CONSTRUCTION",
+      "pillars": [
+        {
+          "label": "Environmental",
+          "subtext": "CO₂ Emissions · Solar Shadow · Microclimate",
+          "metric": "ECO-SIM"
+        },
+        {
+          "label": "Social",
+          "subtext": "Pedestrian Flow · Mobility · Livability",
+          "metric": "SOCIO-INDEX"
+        },
+        {
+          "label": "Economic",
+          "subtext": "Risk Mitigation · CAPEX Efficiency",
+          "metric": "ROI-PREDICT"
+        }
+      ]
+    }
   },
   "problemVision": {
-    "eyebrow": "Problem + Vision",
-    "title": "Cities already have technology. What they lack is connection.",
+    "eyebrow": "Vision",
+    "title": "Connecting the Smart City ecosystem",
     "paragraphs": [
       "Today there are solutions for mobility, safety, energy, the environment, infrastructure, and artificial intelligence.",
       "The problem is that almost all of them work in isolation.",
-      "In a true Smart City, every piece of data should enrich the rest.",
+      "In a true Smart City, **every piece of data should enrich the rest.**",
       "Our vision is to build that layer of intelligence — one capable of connecting every existing solution inside a single platform."
     ],
     "closingA": "Lynce doesn't replace solutions.",
     "closingB": "It integrates them.",
     "nodes": [
-      "Traffic",
+      "Automotive",
       "Digital Twins",
-      "AI",
-      "Environment",
+      "Artificial Intelligence",
+      "Sustainability",
       "Energy",
-      "Public Safety",
-      "Urban Planning",
-      "IoT",
+      "Security",
+      "Maps / GIS",
+      "Connectivity / IoT",
       "Government",
-      "Mobility",
       "Construction",
-      "Sustainability"
+      "Mobility",
+      "Agriculture"
     ]
   },
   "whereWeStart": {
-    "eyebrow": "Where we start",
-    "title": "We start where urban decisions cost millions.",
+    "eyebrow": "",
+    "title": "We act where urban decisions cost millions",
     "paragraphs": [
       "Lynce's first product focuses on the intelligent simulation of urban projects through Digital Twins.",
-      "Before building, you can simulate different scenarios and understand how each decision will impact the city.",
+      "Before building, **you can simulate different scenarios and understand how each decision will impact the city**.",
       "From a new shopping center to a road project or a real-estate development, the platform lets you visualize the effects before committing the investment."
     ],
+    "product": {
+      "eyebrow": "Our Product",
+      "title": "Why simulate before building?",
+      "benefits": [
+        {
+          "title": "Risk Reduction",
+          "description": "Identify energy bottlenecks and design flaws before capital investment."
+        },
+        {
+          "title": "Cost Savings",
+          "description": "Prevent costly modifications in advanced construction stages or post-deployment."
+        },
+        {
+          "title": "Environmental Compliance",
+          "description": "Measure and adjust carbon footprint, gas emissions, and energy efficiency in advance to comply with sustainability standards."
+        },
+        {
+          "title": "Profitability Validation",
+          "description": "Ensure the project is not only viable for society and the environment, but highly profitable for the developing company."
+        }
+      ]
+    },
     "metricPrefix": "Up to",
     "metrics": [
       {
@@ -198,6 +253,7 @@
       }
     ],
     "cardsEyebrow": "Where it applies",
+    "aboutLabel": "About",
     "cards": [
       {
         "front": "Urban Developments",
@@ -205,7 +261,8 @@
           "Neighborhoods",
           "Buildings",
           "Shopping Centers"
-        ]
+        ],
+        "about": "We simulate the environmental, traffic, and social impact of new urban developments to optimize their design before construction."
       },
       {
         "front": "Road Infrastructure",
@@ -214,7 +271,8 @@
           "Intersections",
           "Roundabouts",
           "Highways"
-        ]
+        ],
+        "about": "We evaluate vehicular flow, congestion, and road safety of new infrastructure through predictive simulation."
       },
       {
         "front": "Public Projects",
@@ -223,7 +281,8 @@
           "Schools",
           "Parks",
           "Public Spaces"
-        ]
+        ],
+        "about": "We analyze the impact of public works on the community, measuring accessibility, pedestrian flow, and energy efficiency."
       },
       {
         "front": "Private Construction",
@@ -232,14 +291,18 @@
           "Commercial",
           "Industrial",
           "Corporate"
-        ]
+        ],
+        "about": "We validate the profitability and environmental impact of private projects to maximize return on investment."
       }
     ]
   },
   "cityBuild": {
     "eyebrow": "Digital Twin",
-    "title": "The city comes to life.",
-    "subtitle": "From empty land to a living digital twin: every layer Lynce adds makes the city start to think.",
+    "keyConcept": "Key Concept",
+    "description": "A digital twin is an exact virtual replica of your physical project. It allows us to subject your design to real-world conditions (weather, traffic, energy consumption, lighting) in a safe environment. ",
+    "descriptionBold": "This way we can detect issues, compare alternatives, and find the optimal solution.",
+    "title": "The city comes to life",
+    "subtitle": "Lynce scans real territory, rebuilds its 3D geometry, and sets it thinking with live data.",
     "twin": {
       "liveLabel": "Real-time data",
       "traffic": "Traffic",
@@ -249,10 +312,10 @@
     }
   },
   "urbanIntelligence": {
-    "eyebrow": "Urban Intelligence",
-    "title": "Built on urban intelligence.",
+    "eyebrow": "What sets us apart",
+    "title": "Integration without replacement + pre-construction simulation",
     "paragraphs": [
-      "Lynce combines Digital Twins, Artificial Intelligence, and advanced data analysis to create simulations that can represent how a city behaves before changes ever happen.",
+      "Lynce combines Digital Twins, Artificial Intelligence, and advanced data analysis **to create simulations that can represent how a city behaves before changes ever happen.**",
       "Our platform integrates information from multiple sources to generate more accurate models and enable better decisions."
     ],
     "tiles": {
@@ -265,10 +328,53 @@
       "environment": "Environmental Data"
     }
   },
+  "team": {
+    "eyebrow": "Team",
+    "title": "The people behind Lynce",
+    "description": "We are an interdisciplinary team passionate about technology, sustainability, and engineering, united by the mission to transform the way the spaces we inhabit are built and managed.",
+    "members": [
+      {
+        "name": "Valeria Bravo",
+        "role": "CEO",
+        "tags": [
+          "Vision",
+          "Leadership",
+          "Strategy"
+        ]
+      },
+      {
+        "name": "Carolina Millicevic",
+        "role": "COO",
+        "tags": [
+          "Operations",
+          "Execution",
+          "Processes"
+        ]
+      },
+      {
+        "name": "Lautaro Silva",
+        "role": "CBO",
+        "tags": [
+          "Business",
+          "Sales",
+          "Growth"
+        ]
+      },
+      {
+        "name": "Alexis Ramundo",
+        "role": "CTO",
+        "tags": [
+          "Technology",
+          "Product",
+          "Innovation"
+        ]
+      }
+    ]
+  },
   "ctaSection": {
     "eyebrow": "Get in touch",
-    "title": "Let's plan the next city, together.",
-    "body": "If you're part of a government, a company, a developer, or an organization looking to plan cities with better data, we'd like to meet you. Schedule a meeting with our team or reach out to explore ways to work together.",
+    "title": "Let's plan your next project, together",
+    "body": "Take the first step towards smarter, more efficient, and profitable urban planning. Ensure the success of your investment before building.",
     "tabSchedule": "Schedule a Meeting",
     "tabContact": "Contact Us",
     "scheduleHint": "Pick a day and time that works for you.",

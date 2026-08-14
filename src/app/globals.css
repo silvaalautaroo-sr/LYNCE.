@@ -35,38 +35,6 @@
   color-scheme: dark;
 }
 
-.light {
-  /* ---- Lynce light theme — flat solid white background, matching
-     HeroCity.tsx's base fill (see draw() in HeroCity.tsx) ---- */
-  --bg-primary: #ffffff;
-  --bg-secondary: #cddef2;
-  --accent-primary: #e8834f;   /* naranja */
-  --accent-secondary: #f2739c; /* rosa */
-  --accent-tertiary: #a8a29e;  /* gris cálido */
-
-  --accent-primary-rgb: 232, 131, 79;
-  --accent-secondary-rgb: 242, 115, 156;
-  --accent-tertiary-rgb: 168, 162, 158;
-
-  /* Palabras clave — cálido: naranja -> rosa -> gris */
-  --keyword-gradient: linear-gradient(100deg, #e8834f 0%, #f2739c 55%, #a8a29e 100%);
-  --bg-glow-color: rgba(232, 131, 79, 0.12);
-
-  --ink: #000000;
-  --ink-muted: rgba(0, 0, 0, 0.66);
-  --ink-faint: rgba(0, 0, 0, 0.42);
-
-  --border-soft: rgba(0, 0, 0, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-bg-strong: rgba(255, 255, 255, 0.72);
-  --grid-line: rgba(0, 0, 0, 0.06);
-
-  --header-bg: rgba(220, 232, 248, 0.6);
-  --shadow-glow: 0 0 40px rgba(232, 131, 79, 0.16);
-
-  color-scheme: light;
-}
-
 * {
   border-color: var(--border-soft);
 }
@@ -248,19 +216,6 @@ body {
   animation: hero-gradient-drift 8s ease-in-out infinite alternate;
 }
 
-.light .hero-word-gradient {
-  background: linear-gradient(
-    100deg,
-    #f4a6c1, #f7c98e, #f4e08a, #a8e0b8,
-    #9fd6e8, #b3aaf0, #f4a6c1
-  );
-  background-size: 380% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: hero-gradient-rainbow 8s ease-in-out infinite alternate;
-}
-
 @keyframes hero-gradient-drift {
   0%   { background-position: 0% 50%;   }
   100% { background-position: 220% 50%; }
@@ -272,32 +227,17 @@ body {
 }
 
 /* Light mode hero text colors */
-.light .light-hero-text    { color: #0f172a; }
-.light .light-hero-subtext { color: rgba(15, 23, 42, 0.65); }
 
 /* Light mode — hero fog line color */
 .hero-line-dark  { --tw-gradient-from: rgba(255,255,255,0.3); }
-.light .bg-gradient-to-r.from-hero-line {
-  --tw-gradient-from: rgba(15, 23, 42, 0.2);
-}
 
 /* ========================================================== */
 /* RAINBOW ACCENT — light mode iridescent details              */
 /* ========================================================== */
 
-.light .rainbow-accent {
-  animation: hue-spin 5s linear infinite;
-}
-
 @keyframes hue-spin {
   from { filter: hue-rotate(0deg) saturate(1.4); }
   to   { filter: hue-rotate(360deg) saturate(1.4); }
-}
-
-.light .accent-line,
-.light .accent-dot,
-.light .accent-border {
-  animation: hue-spin 6s linear infinite;
 }
 
 /* ========================================================== */
@@ -307,10 +247,6 @@ body {
   --tw-gradient-from: rgba(255,255,255,0.25);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255,255,255,0));
 }
-.light .from-hero-line {
-  --tw-gradient-from: rgba(99,102,241,0.4);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(99,102,241,0));
-}
 
 /* ========================================================== */
 /* NAVBAR WORDMARK — rainbow in light mode                     */
@@ -318,23 +254,6 @@ body {
 
 .navbar-wordmark-rainbow {
   color: var(--ink);
-}
-
-.light .navbar-wordmark-rainbow {
-  background: linear-gradient(
-    108deg,
-    #e879f9 0%,
-    #818cf8 22%,
-    #38bdf8 45%,
-    #34d399 65%,
-    #fbbf24 82%,
-    #f87171 100%
-  );
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: navbar-rainbow-sweep 4s linear infinite;
 }
 
 @keyframes navbar-rainbow-sweep {
@@ -348,20 +267,6 @@ body {
 
 .navbar-wordmark-fill {
   background: var(--ink);
-}
-
-.light .navbar-wordmark-fill {
-  background: linear-gradient(
-    108deg,
-    #e879f9 0%,
-    #818cf8 22%,
-    #38bdf8 45%,
-    #34d399 65%,
-    #fbbf24 82%,
-    #f87171 100%
-  );
-  background-size: 300% 100%;
-  animation: navbar-rainbow-sweep 4s linear infinite;
 }
 
 /* ========================================================== */
@@ -381,14 +286,3 @@ body {
   opacity: 0.9;
 }
 
-.light .hero-bottom-glow {
-  background: radial-gradient(
-    120% 100% at 50% 100%,
-    rgba(244, 166, 193, 0.35) 0%,
-    rgba(159, 214, 232, 0.28) 30%,
-    rgba(179, 170, 240, 0.18) 55%,
-    rgba(247, 245, 242, 0) 78%
-  );
-  filter: blur(48px);
-  opacity: 0.85;
-}

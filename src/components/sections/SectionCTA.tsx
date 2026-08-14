@@ -19,10 +19,10 @@ type Tab = "schedule" | "contact";
  */
 export function SectionCTA() {
   const t = useTranslations("ctaSection");
-  const [tab, setTab] = useState<Tab>("schedule");
+  const [tab, setTab] = useState<Tab>("contact");
 
   return (
-    <section id="contact" className="relative overflow-hidden py-32 lg:py-40">
+    <section id="contact" className="relative overflow-hidden py-20 lg:py-28">
       {/* Soft glow */}
       <div
         aria-hidden="true"
@@ -73,7 +73,7 @@ export function SectionCTA() {
           transition={{ duration: 0.6, delay: 0.2, ease }}
           className="glass mx-auto mt-12 flex w-fit gap-1 rounded-full p-1"
         >
-          {(["schedule", "contact"] as Tab[]).map((key) => {
+          {(["contact", "schedule"] as Tab[]).map((key) => {
             const active = tab === key;
             const Icon = key === "schedule" ? CalendarDays : Mail;
             return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTheme } from "next-themes";
+
 
 interface CalendlyEmbedProps {
   /**
@@ -46,14 +46,11 @@ export function CalendlyEmbed({
   url = "https://calendly.com/lynce/30min",
   height = 640,
 }: CalendlyEmbedProps) {
-  const { resolvedTheme } = useTheme();
   const ready = useCalendlyAssets();
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Tint the widget to match the current theme accent.
-  const accent = resolvedTheme === "light" ? "e8834f" : "18c29c";
-  const bg = resolvedTheme === "light" ? "ffffff" : "05090f";
-  const text = resolvedTheme === "light" ? "0f172a" : "ffffff";
+  const accent = "18c29c";
+  const bg = "05090f";
+  const text = "ffffff";
 
   useEffect(() => {
     if (!ready || !containerRef.current) return;

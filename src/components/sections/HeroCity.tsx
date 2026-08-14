@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
+
 import { useTranslations } from "next-intl";
 
 const PALETTES = [
@@ -51,11 +51,7 @@ export function HeroCity() {
   const bRef      = useRef<Building[]>([]);
   const rafRef    = useRef(0);
   const sizeRef   = useRef({ w: 0, h: 0 });
-  const { resolvedTheme } = useTheme();
-  const themeRef  = useRef(resolvedTheme);
   const t         = useTranslations("hero");
-
-  useEffect(() => { themeRef.current = resolvedTheme; }, [resolvedTheme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,7 +107,7 @@ export function HeroCity() {
       if (W > 0 && H > 0) {
         if (!started) { t0 = ts; started = true; }
         const time   = (ts - t0) / 1000;
-        const isDark = themeRef.current !== "light";
+        const isDark = true;
 
         const TW = Math.max(46, Math.min(86, W / 12));
         const TH = TW * 0.5;

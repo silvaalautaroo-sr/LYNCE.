@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundFX } from "@/components/ui/BackgroundFX";
+import { SideNavProgress } from "@/components/ui/SideNavProgress";
 import "@/app/globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -90,6 +91,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider messages={messages}>
             <BackgroundFX />
             <Header />
+            <SideNavProgress />
             <main id="main-content" tabIndex={-1}>
               {children}
             </main>

@@ -2,12 +2,14 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 const NAV_ITEMS = [
-  "platform",
-  "ecosystem",
-  "technology",
-  "vision",
-  "about",
-  "contact",
+  { key: "intro", id: "intro" },
+  { key: "product", id: "product" },
+  { key: "cases", id: "cases" },
+  { key: "digitalTwin", id: "digital-twin" },
+  { key: "difference", id: "difference" },
+  { key: "vision", id: "vision" },
+  { key: "team", id: "team" },
+  { key: "contact", id: "contact" },
 ] as const;
 
 export function Footer() {
@@ -16,10 +18,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      id="about"
-      className="border-t border-border bg-bg-primary/80 backdrop-blur-xl"
-    >
+    <footer className="border-t border-border bg-bg-primary/80 backdrop-blur-xl">
       <div className="container mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-12 md:grid-cols-[1fr_auto_auto]">
           {/* Brand */}
@@ -56,13 +55,13 @@ export function Footer() {
               {tf("navTitle")}
             </p>
             <ul className="space-y-2.5">
-              {NAV_ITEMS.map((key) => (
-                <li key={key}>
+              {NAV_ITEMS.map((item) => (
+                <li key={item.key}>
                   <a
-                    href={`#${key}`}
+                    href={`#${item.id}`}
                     className="text-sm text-ink-muted transition-colors hover:text-ink"
                   >
-                    {t(key)}
+                    {t(item.key)}
                   </a>
                 </li>
               ))}

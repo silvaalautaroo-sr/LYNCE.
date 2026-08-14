@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useTheme } from "next-themes";
+
 
 export function Logo() {
-  const { resolvedTheme } = useTheme();
+
   const [mounted, setMounted] = useState(false);
   const [heroH, setHeroH] = useState(800);
   const { scrollY } = useScroll();
@@ -18,7 +18,7 @@ export function Logo() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const isDark = !mounted || resolvedTheme !== "light";
+  const isDark = true;
 
   // ── Scroll range: animation starts at 32% of hero, finishes at 72% ─────────
   const s = heroH * 0.32;

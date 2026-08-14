@@ -2,7 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ConvergenceNetwork } from "@/components/ui/ConvergenceNetwork";
+import { LynceHeatmap } from "@/components/ui/LynceHeatmap";
+import { formatTextWithBold } from "@/lib/format";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -19,7 +20,7 @@ export function SectionProblemVision() {
   const nodes = t.raw("nodes") as string[];
 
   return (
-    <section id="ecosystem" className="relative overflow-hidden py-32 lg:py-40">
+    <section id="vision" className="relative overflow-hidden py-20 lg:py-28">
       <div className="container mx-auto max-w-6xl px-6">
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
           {/* Left — copy */}
@@ -55,7 +56,7 @@ export function SectionProblemVision() {
                   transition={{ duration: 0.65, delay: 0.1 + i * 0.08, ease }}
                   className="text-base leading-relaxed text-ink-muted"
                 >
-                  {p}
+                  {formatTextWithBold(p)}
                 </motion.p>
               ))}
             </div>
@@ -74,7 +75,7 @@ export function SectionProblemVision() {
 
           {/* Right — signature animation */}
           <div className="relative">
-            <ConvergenceNetwork labels={nodes} />
+            <LynceHeatmap labels={nodes} />
           </div>
         </div>
       </div>

@@ -11,11 +11,13 @@
     "line4Part2": "Cities"
   },
   "nav": {
-    "platform": "Plataforma",
-    "ecosystem": "Ecosistema",
-    "technology": "Tecnología",
+    "intro": "Quienes somos",
+    "product": "Producto",
+    "cases": "Casos de aplicación",
+    "digitalTwin": "Gemelo Digital",
+    "difference": "Tecnología",
     "vision": "Visión",
-    "about": "Nosotros",
+    "team": "Equipo",
     "contact": "Contacto",
     "brand": "Lynce"
   },
@@ -29,7 +31,7 @@
     "en": "EN"
   },
   "cta": {
-    "talkToUs": "Habla con nosotros"
+    "talkToUs": "Trabaja con nosotros"
   },
   "section1": {
     "eyebrow": "El problema",
@@ -107,51 +109,104 @@
     "subtext": "Lynce existe para ser esa colaboración."
   },
   "footer": {
-    "tagline": "Cosas inteligentes para ciudades inteligentes.",
+    "tagline": "Visión inteligente para ciudades inteligentes",
     "navTitle": "Navegación",
     "contactTitle": "Contacto",
     "email": "hola@lynce.tech",
     "rights": "Todos los derechos reservados."
   },
+  "usp": {
+    "title": "Simula el impacto de proyectos urbanos antes de construirlos",
+    "pre": "Simula el impacto de ",
+    "highlight": "proyectos urbanos",
+    "post": " antes de construirlos"
+  },
   "intro": {
-    "pre": "Lynce es una startup argentina que desarrolla la infraestructura digital que conecta, organiza y potencia las tecnologías de una ",
-    "highlight": "ciudad inteligente",
-    "post": "."
+    "eyebrow": "¿Qué es Lynce?",
+    "paragraphs": [
+      "Lynce es el aliado estratégico para quienes diseñan las ciudades del mañana. A través de tecnología avanzada, simulamos la construcción de proyectos urbanos para **evaluar su impacto ambiental, social y económico**.",
+      "Analizamos variables críticas y ayudamos a comprender el verdadero impacto de las decisiones urbanas, permitiendo a las empresas constructoras y organizaciones **optimizar recursos, mitigar riesgos y obtener mayores beneficios** desde la <gradient>etapa de planificación.</gradient>"
+    ],
+    "console": {
+      "motor": "MOTOR LYNCE",
+      "twinPlusAi": "GEMELO DIGITAL + IA",
+      "evaluation": "EVALUACIÓN MULTIVARIABLE",
+      "horizon": "HORIZONTE: PREVIO A LA OBRA",
+      "pillars": [
+        {
+          "label": "Ambiental",
+          "subtext": "Emisiones CO₂ · Sombra solar · Microclima",
+          "metric": "ECO-SIM"
+        },
+        {
+          "label": "Social",
+          "subtext": "Flujo peatonal · Movilidad · Habitabilidad",
+          "metric": "SOCIO-INDEX"
+        },
+        {
+          "label": "Económico",
+          "subtext": "Mitigación de riesgos · Eficiencia CAPEX",
+          "metric": "ROI-PREDICT"
+        }
+      ]
+    }
   },
   "problemVision": {
-    "eyebrow": "Problema + Visión",
-    "title": "Las ciudades ya tienen tecnología. Lo que les falta es conexión.",
+    "eyebrow": "Visión",
+    "title": "Conectando el ecosistema de la Smart City",
     "paragraphs": [
       "Hoy existen soluciones para movilidad, seguridad, energía, medio ambiente, infraestructura e inteligencia artificial.",
       "El problema es que casi todas funcionan de manera independiente.",
-      "En una verdadera Smart City, cada dato debería enriquecer al resto.",
+      "En una verdadera Smart City, **cada dato debería enriquecer al resto.**",
       "Nuestra visión es construir esa capa de inteligencia capaz de conectar todas las soluciones existentes dentro de una única plataforma."
     ],
     "closingA": "Lynce no reemplaza soluciones.",
     "closingB": "Las integra.",
     "nodes": [
-      "Tráfico",
+      "Automotriz",
       "Gemelos Digitales",
-      "IA",
-      "Medio Ambiente",
+      "Inteligencia Artificial",
+      "Sostenibilidad",
       "Energía",
-      "Seguridad Pública",
-      "Planificación Urbana",
-      "IoT",
+      "Seguridad",
+      "Mapas / GIS",
+      "Conectividad / IoT",
       "Gobierno",
-      "Movilidad",
       "Construcción",
-      "Sostenibilidad"
+      "Movilidad",
+      "Agricultura"
     ]
   },
   "whereWeStart": {
-    "eyebrow": "Dónde empezamos",
-    "title": "Empezamos donde las decisiones urbanas cuestan millones.",
+    "eyebrow": "",
+    "title": "Actuamos donde las decisiones urbanas cuestan millones",
     "paragraphs": [
       "El primer producto de Lynce está enfocado en la simulación inteligente de proyectos urbanos mediante Gemelos Digitales.",
-      "Antes de construir, es posible simular distintos escenarios y comprender cómo cada decisión impactará sobre la ciudad.",
+      "Antes de construir, **es posible simular distintos escenarios y comprender cómo cada decisión impactará sobre la ciudad**.",
       "Desde un nuevo centro comercial hasta una obra vial o un desarrollo inmobiliario, la plataforma permite visualizar sus efectos antes de ejecutar la inversión."
     ],
+    "product": {
+      "eyebrow": "Nuestro Producto",
+      "title": "¿Por qué simular antes de construir?",
+      "benefits": [
+        {
+          "title": "Reducción de Riesgos",
+          "description": "Identifica cuellos de botella energéticos y fallas de diseño antes de la inversión de capital."
+        },
+        {
+          "title": "Ahorro de Costos",
+          "description": "Evita modificaciones costosas en etapas avanzadas de construcción o post-despliegue."
+        },
+        {
+          "title": "Cumplimiento Ambiental",
+          "description": "Mide y ajusta de antemano la huella de carbono, la emisión de gases y la eficiencia energética para cumplir con normativas de sostenibilidad."
+        },
+        {
+          "title": "Validación de Rentabilidad",
+          "description": "Asegura que el proyecto no solo sea viable para la sociedad y el ambiente, sino altamente rentable para la empresa desarrolladora."
+        }
+      ]
+    },
     "metricPrefix": "Hasta",
     "metrics": [
       {
@@ -176,6 +231,7 @@
       }
     ],
     "cardsEyebrow": "Casos de aplicación",
+    "aboutLabel": "Acerca de",
     "cards": [
       {
         "front": "Desarrollos Urbanos",
@@ -183,7 +239,8 @@
           "Barrios",
           "Edificios",
           "Centros Comerciales"
-        ]
+        ],
+        "about": "Simulamos el impacto ambiental, vial y social de nuevos desarrollos urbanos para optimizar su diseño antes de la construcción."
       },
       {
         "front": "Infraestructura Vial",
@@ -192,7 +249,8 @@
           "Intersecciones",
           "Rotondas",
           "Autopistas"
-        ]
+        ],
+        "about": "Evaluamos el flujo vehicular, la congestión y la seguridad vial de nuevas obras de infraestructura mediante simulación predictiva."
       },
       {
         "front": "Obras Públicas",
@@ -201,7 +259,8 @@
           "Escuelas",
           "Parques",
           "Espacios Públicos"
-        ]
+        ],
+        "about": "Analizamos el impacto de obras públicas sobre la comunidad, midiendo accesibilidad, flujo peatonal y eficiencia energética."
       },
       {
         "front": "Construcción Privada",
@@ -210,14 +269,18 @@
           "Comercial",
           "Industrial",
           "Corporativo"
-        ]
+        ],
+        "about": "Validamos la rentabilidad y el impacto ambiental de proyectos privados para maximizar el retorno de la inversión."
       }
     ]
   },
   "cityBuild": {
     "eyebrow": "Gemelo Digital",
-    "title": "La ciudad cobra vida.",
-    "subtitle": "De la imagen satelital al gemelo digital: Lynce escanea el territorio real, reconstruye su geometría en 3D y la pone a pensar con datos en vivo.",
+    "keyConcept": "Concepto Clave",
+    "description": "Un gemelo digital es una réplica virtual exacta de tu proyecto físico. Nos permite someter tu diseño a condiciones del mundo real (clima, tráfico, consumo de energía, iluminación) en un entorno seguro. ",
+    "descriptionBold": "Así podemos detectar problemas, comparar alternativas y encontrar la mejor solución.",
+    "title": "La ciudad cobra vida",
+    "subtitle": "Lynce escanea el territorio real, reconstruye su geometría en 3D y la pone a pensar con datos en vivo.",
     "twin": {
       "liveLabel": "Datos en tiempo real",
       "traffic": "Tráfico",
@@ -227,10 +290,10 @@
     }
   },
   "urbanIntelligence": {
-    "eyebrow": "Inteligencia Urbana",
-    "title": "Construido sobre inteligencia urbana.",
+    "eyebrow": "Lo que nos diferencia",
+    "title": "Integración sin reemplazo + simulación previa a la construcción",
     "paragraphs": [
-      "Lynce combina Gemelos Digitales, Inteligencia Artificial y análisis avanzado de datos para crear simulaciones capaces de representar el comportamiento de una ciudad antes de que los cambios ocurran.",
+      "Lynce combina Gemelos Digitales, Inteligencia Artificial y análisis avanzado de datos **para crear simulaciones capaces de representar el comportamiento de una ciudad antes de que los cambios ocurran.**",
       "Nuestra plataforma integra información proveniente de múltiples fuentes para generar modelos más precisos y facilitar mejores decisiones."
     ],
     "tiles": {
@@ -243,10 +306,53 @@
       "environment": "Datos Ambientales"
     }
   },
+  "team": {
+    "eyebrow": "Equipo",
+    "title": "Las personas detrás de Lynce",
+    "description": "Somos un equipo interdisciplinario apasionado por la tecnología, la sostenibilidad y la ingeniería, unidos por la misión de transformar la manera en que se construyen y gestionan los espacios que habitamos.",
+    "members": [
+      {
+        "name": "Valeria Bravo",
+        "role": "CEO",
+        "tags": [
+          "Visión",
+          "Liderazgo",
+          "Estrategia"
+        ]
+      },
+      {
+        "name": "Carolina Millicevic",
+        "role": "COO",
+        "tags": [
+          "Operaciones",
+          "Ejecución",
+          "Procesos"
+        ]
+      },
+      {
+        "name": "Lautaro Silva",
+        "role": "CBO",
+        "tags": [
+          "Negocios",
+          "Ventas",
+          "Crecimiento"
+        ]
+      },
+      {
+        "name": "Alexis Ramundo",
+        "role": "CTO",
+        "tags": [
+          "Tecnología",
+          "Producto",
+          "Innovación"
+        ]
+      }
+    ]
+  },
   "ctaSection": {
     "eyebrow": "Contacto",
-    "title": "Planifiquemos la próxima ciudad, juntos.",
-    "body": "Si formas parte de un gobierno, una empresa, una desarrolladora o una organización que busca planificar ciudades con mejores datos, nos gustaría conocerte. Agenda una reunión con nuestro equipo o contáctanos para explorar posibles colaboraciones.",
+    "title": "Planifiquemos tu próximo proyecto, juntos",
+    "body": "Da el primer paso hacia una planificación urbana más inteligente, eficiente y rentable. Garantiza el éxito de tu inversión antes de construir.",
     "tabSchedule": "Agendar una reunión",
     "tabContact": "Contáctanos",
     "scheduleHint": "Elegí un día y horario que te quede cómodo.",

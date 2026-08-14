@@ -18,7 +18,7 @@ export function Section4OwnSolutions() {
   const t = useTranslations("ownSolutions");
 
   return (
-    <section className="relative overflow-hidden py-32 lg:py-40">
+    <section className="relative overflow-hidden py-20 lg:py-28">
       <div className="container mx-auto max-w-6xl px-6">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           {/* Left — text */}

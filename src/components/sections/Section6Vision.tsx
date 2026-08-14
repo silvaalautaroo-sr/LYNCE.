@@ -10,7 +10,7 @@ export function Section6Vision() {
   const words = t("statement").split(" ");
 
   return (
-    <section id="vision" className="relative overflow-hidden py-40 lg:py-56">
+    <section id="vision" className="relative overflow-hidden py-28 lg:py-36">
       {/* Anchor kept for the header CTA and footer "contact" link — this
           closing section doubles as the site's contact point (mailto CTA
           below), so it's addressable both as #vision and #contact. */}

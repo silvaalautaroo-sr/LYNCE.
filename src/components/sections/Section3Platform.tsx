@@ -58,7 +58,7 @@ export function Section3Platform() {
   return (
     <section
       id="platform"
-      className="relative overflow-hidden py-32 lg:py-40"
+      className="relative overflow-hidden py-20 lg:py-28"
     >
       <div className="container mx-auto max-w-4xl px-6">
         <SectionHeading

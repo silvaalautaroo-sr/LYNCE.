@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 interface CityBuildCanvasProps {
-  theme: "dark" | "light";
+  theme?: "dark";
   /** Fired once when the digital-twin stage begins (HUD appears). */
   onTwinReady?: () => void;
   /** Tag text for the highlighted building. */
@@ -42,7 +42,7 @@ interface Palette {
   tagBg: string;
 }
 
-const PALETTES: Record<"dark" | "light", Palette> = {
+const PALETTES: Record<"dark", Palette> = {
   dark: {
     land: "#0a1119",
     satBlock: "#243040",
@@ -60,28 +60,10 @@ const PALETTES: Record<"dark" | "light", Palette> = {
     ink: "#eaf4ff",
     tagBg: "rgba(8,16,26,0.82)",
   },
-  light: {
-    land: "#e8edf4",
-    satBlock: "#c3cdd9",
-    wire: "#e8834f",
-    faceF: "#d6dfea",
-    faceS: "#c4d0de",
-    top: "#f4f8fd",
-    park: "#8fc4a6",
-    parkDark: "#7db394",
-    meadow: "#a4d4b6",
-    water: "#8fc0e0",
-    accent: "#e8834f",
-    accent2: "#f2739c",
-    window: "#f7b98e",
-    ink: "#13202e",
-    tagBg: "rgba(255,255,255,0.85)",
-  },
 };
 
-const ACCENT_RGB: Record<"dark" | "light", string> = {
+const ACCENT_RGB: Record<"dark", string> = {
   dark: "24,194,156",
-  light: "232,131,79",
 };
 
 /* ── Manhattan frame around Central Park ──────────────────────────────────── */
@@ -148,7 +130,7 @@ function mixHex(c1: string, c2: string, t: number) {
 }
 
 export function CityBuildCanvas({
-  theme,
+  theme = "dark",
   onTwinReady,
   label = "Simulation Builder",
 }: CityBuildCanvasProps) {

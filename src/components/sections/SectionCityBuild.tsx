@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
-import { Activity, Cloudy, Lightbulb, Users } from "lucide-react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+
+import { Activity, Cloudy, Lightbulb, Users, Layers, Cpu } from "lucide-react";
 import { CityBuildCanvas } from "@/components/ui/CityBuildCanvas";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -17,9 +17,16 @@ const ease = [0.16, 1, 0.3, 1] as const;
  */
 export function SectionCityBuild() {
   const t = useTranslations("cityBuild");
-  const { resolvedTheme } = useTheme();
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, {
+    amount: 0.15,
+    margin: "-30px 0px -30px 0px",
+  });
+
   const [mounted, setMounted] = useState(false);
   const [twinReady, setTwinReady] = useState(false);
+  const [animCycle, setAnimCycle] = useState(0);
 
   // Live-ish values that keep ticking once the twin is active
   const [live, setLive] = useState({ traffic: 62, emissions: 34, lighting: 88, pedestrians: 214 });
@@ -27,6 +34,16 @@ export function SectionCityBuild() {
   useEffect(() => setMounted(true), []);
 
   const handleTwinReady = useCallback(() => setTwinReady(true), []);
+
+  // When section enters the viewport, restart the animation from 0
+  useEffect(() => {
+    if (isInView) {
+      setTwinReady(false);
+      setAnimCycle((c) => c + 1);
+    } else {
+      setTwinReady(false);
+    }
+  }, [isInView]);
 
   useEffect(() => {
     if (!twinReady) return;
@@ -41,7 +58,7 @@ export function SectionCityBuild() {
     return () => clearInterval(id);
   }, [twinReady]);
 
-  const theme = mounted && resolvedTheme === "light" ? "light" : "dark";
+  const theme = "dark";
 
   const chips = [
     { icon: Activity, label: t("twin.traffic"), value: `${live.traffic}%` },
@@ -51,36 +68,29 @@ export function SectionCityBuild() {
   ];
 
   return (
-    <section id="vision" className="relative overflow-hidden py-28 lg:py-36">
+    <section
+      ref={sectionRef}
+      id="digital-twin"
+      className="relative overflow-hidden py-12 sm:py-16 lg:py-20"
+    >
       <div className="container mx-auto max-w-6xl px-6">
         {/* Heading */}
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease }}
-            className="mb-4 flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-[0.22em]"
-          >
-            <span className="h-px w-6 bg-accent-primary/60" />
-            <span className="keyword-gradient">{t("eyebrow")}</span>
-            <span className="h-px w-6 bg-accent-primary/60" />
-          </motion.p>
+        <div className="mx-auto mb-7 max-w-4xl text-center sm:mb-9 lg:max-w-5xl">
           <motion.h2
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.05, ease }}
-            className="text-balance text-3xl font-medium leading-[1.15] tracking-tight text-ink sm:text-4xl lg:text-[2.75rem]"
+            transition={{ duration: 0.65, delay: 0.08, ease }}
+            className="text-balance text-3xl font-medium leading-[1.15] tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]"
           >
             {t("title")}
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15, ease }}
-            className="mt-4 text-balance text-base leading-relaxed text-ink-muted sm:text-lg"
+            transition={{ duration: 0.65, delay: 0.14, ease }}
+            className="mt-2.5 text-base leading-relaxed text-ink-muted sm:mt-3 sm:text-lg md:whitespace-nowrap"
           >
             {t("subtitle")}
           </motion.p>
@@ -88,14 +98,18 @@ export function SectionCityBuild() {
 
         {/* Canvas stage */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.9, ease }}
-          className="glass relative aspect-[16/11] w-full overflow-hidden rounded-3xl sm:aspect-[16/9]"
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.8, ease }}
+          className="glass relative mx-auto aspect-[16/11] w-full max-w-4xl overflow-hidden rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.55)] sm:aspect-[16/9] lg:aspect-[1.95/1] sm:rounded-3xl"
         >
-          {mounted && (
-            <CityBuildCanvas theme={theme} onTwinReady={handleTwinReady} />
+          {mounted && isInView && (
+            <CityBuildCanvas
+              key={animCycle}
+              theme={theme}
+              onTwinReady={handleTwinReady}
+            />
           )}
 
           {/* Live "digital twin" HUD label */}
@@ -149,6 +163,47 @@ export function SectionCityBuild() {
               </motion.div>
             )}
           </AnimatePresence>
+        </motion.div>
+
+        {/* Concept Definition: Gemelo Digital (Integrated into background) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1, ease }}
+          className="mx-auto mt-14 max-w-4xl"
+        >
+          {/* Header Meta */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-primary/30 bg-accent-primary/10 text-accent-primary shadow-[0_0_15px_rgba(43,255,156,0.15)]">
+                <Layers className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-accent-primary">
+                  {t("keyConcept")}
+                </span>
+                <h3 className="text-lg font-bold tracking-tight text-ink sm:text-xl">
+                  <span className="keyword-gradient">{t("eyebrow")}</span>
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[11px] text-ink-muted">
+              <Cpu className="h-3 w-3 text-accent-secondary" />
+              <span>DIGITAL TWIN ARCHITECTURE</span>
+            </div>
+          </div>
+
+          {/* Definition Text */}
+          <div>
+            <p className="text-pretty text-base font-light leading-relaxed text-ink-muted sm:text-lg lg:text-[1.15rem] lg:leading-[1.75]">
+              {t("description")}
+              <strong className="font-semibold text-ink">
+                {t("descriptionBold")}
+              </strong>
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>
